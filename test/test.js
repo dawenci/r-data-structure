@@ -1,41 +1,74 @@
 const AVLTree = window.DTree.AVLTree
 const RBTree = window.DTree.RedBlackTree
 const testDatas = []
+const testDatas2 = []
 let randomSearchOrder
-for (let i = 0; i < 1000000; i += 1) {
+let randomSearchOrder2
+
+for (let i = 0; i < 100000; i += 1) {
   let value = Math.random()
-  value = Math.ceil(value * 1000000000)
+  value = Math.ceil(value * 100000000)
   testDatas.push({value, compareTo(other) { return other.value - this.value }})
+  testDatas2.push({value, compareTo(other) { return other.value - this.value }})
 }
 randomSearchOrder = testDatas.slice()
+randomSearchOrder2 = testDatas2.slice()
 randomSearchOrder.sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
-const tree = new AVLTree()
-// const tree = new RBTree()
+randomSearchOrder2.sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
+
+const avl = new AVLTree()
+const rbt = new RBTree()
+
 console.log('%c==============================================', 'color:#f80')
 console.time('AVL Tree total:')
 console.time('AVL Tree insert')
-testDatas.forEach((val) => tree.insert(val, val))
+testDatas.forEach((val) => avl.insert(val, val))
 console.timeEnd('AVL Tree insert')
 console.time('AVL Tree search')
 const searchResult = []
 randomSearchOrder.forEach((val) => {
-  searchResult.push(tree.getValue(val))
+  searchResult.push(avl.getValue(val))
 })
 console.timeEnd('AVL Tree search')
 console.time('AVL Tree traversal')
 let traversal = []
-tree.forEach((value, key, tree) => traversal.push(key))
+avl.forEach((value, key, tree) => traversal.push(key))
 console.timeEnd('AVL Tree traversal')
 console.time('AVL Tree delete')
 randomSearchOrder.forEach(val => {
-  tree.delete(val)
+  avl.delete(val)
 })
 console.timeEnd('AVL Tree delete')
 console.timeEnd('AVL Tree total:')
 console.log('%c==============================================', 'color:#f80')
-console.log('Tree instance:', tree)
-  // console.log('Tree (R) instance:', treeR)
-console.log('Tree search:', searchResult)
-  // console.log('Tree (R) search:', searchResultR)
-console.log('Tree traversal:', traversal)
-  // console.log('Tree (R) traversal:', traversalR)
+console.log('AVL instance:', avl)
+console.log('AVL search:', searchResult)
+console.log('AVL traversal:', traversal)
+
+
+
+console.log('%c==============================================', 'color:#f80')
+console.time('RB Tree total:')
+console.time('RB Tree insert')
+testDatas2.forEach((val) => rbt.insert(val, val))
+console.timeEnd('RB Tree insert')
+console.time('RB Tree search')
+const searchResult2 = []
+randomSearchOrder2.forEach((val) => {
+  searchResult2.push(rbt.getValue(val))
+})
+console.timeEnd('RB Tree search')
+console.time('RB Tree traversal')
+let traversal2 = []
+rbt.forEach((value, key, tree) => traversal2.push(key))
+console.timeEnd('RB Tree traversal')
+console.time('RB Tree delete')
+randomSearchOrder2.forEach(val => {
+  rbt.delete(val)
+})
+console.timeEnd('RB Tree delete')
+console.timeEnd('RB Tree total:')
+console.log('%c==============================================', 'color:#f80')
+console.log('RB instance:', rbt)
+console.log('RB search:', searchResult2)
+console.log('RB traversal:', traversal2)
