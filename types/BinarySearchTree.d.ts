@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { Comparable } from './Comparable';
 export declare type Nil = null;
-export declare class Node<K extends Comparable<any>, V = any> {
+export declare class Node<K extends Comparable<K>, V = any> {
     key: K;
     value: V;
     /**
@@ -35,7 +35,7 @@ export declare class Node<K extends Comparable<any>, V = any> {
      */
     constructor(key: K, value: V);
 }
-export declare class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>> {
+export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>> {
     private _root;
     private _size;
     /**
@@ -52,14 +52,6 @@ export declare class BinarySearchTree<K extends Comparable<any>, V = any, T exte
      * @memberof BinarySearchTree
      */
     readonly size: number;
-    /**
-     * 是否叶子结点
-     *
-     * @readonly
-     * @type {boolean}
-     * @memberof Node
-     */
-    isLeaf(node: T): boolean;
     setLeft(node: T, child: T): void;
     setRight(node: T, child: T): void;
     /**
@@ -138,7 +130,7 @@ export declare class BinarySearchTree<K extends Comparable<any>, V = any, T exte
      * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    static preorder<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
+    static preorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
     /**
      * 中序遍历迭代器
      *
@@ -150,7 +142,7 @@ export declare class BinarySearchTree<K extends Comparable<any>, V = any, T exte
      * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    static inorder<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
+    static inorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
     /**
      * 后续遍历迭代器
      *
@@ -162,7 +154,7 @@ export declare class BinarySearchTree<K extends Comparable<any>, V = any, T exte
      * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    static postorder<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
+    static postorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
     /**
      * 获取根结点的前序遍历迭代器
      *

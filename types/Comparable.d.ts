@@ -1,7 +1,7 @@
-export interface Comparator<T> {
-    (a: Comparable<T>, b: Comparable<T>): number;
+export interface Comparable<T extends Comparable<T>> {
+    compareTo(other: T): number;
 }
-export interface Comparable<T> {
-    compareTo(other: Comparable<T>): number;
+export interface Comparator<T extends Comparable<T>> {
+    (a: T, b: T): number;
 }
-export declare function compare<T>(a: Comparable<T>, b: Comparable<T>): number;
+export declare function compare<T extends Comparable<T>>(a: T, b: T): number;

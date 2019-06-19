@@ -18,7 +18,7 @@ const RED = true
 const BLACK = false
 export type Color = boolean
 
-export class RBNode<K extends Comparable<any>, V = any> extends Node<K, V> {
+export class RBNode<K extends Comparable<K>, V = any> extends Node<K, V> {
   /**
    * 结点颜色，新插入结点默认红色
    *
@@ -32,13 +32,15 @@ export class RBNode<K extends Comparable<any>, V = any> extends Node<K, V> {
   }
 }
 
-export class RBNilNode<K extends Comparable<any>, V = any> extends RBNode<K, V> {
-  constructor(key: K, value? : V) {
-    super({ compareTo(other: Comparable<any>) { return 0 } } as K, null);
+const NilKey = { compareTo: (other) => 0 }
+export class RBNilNode<K extends Comparable<K>, V = any> extends RBNode<K, V> {
+  constructor() {
+    super(NilKey as K, null);
+    this.color = BLACK
   }
 }
 
-export class RedBlackTree<K extends Comparable<any>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
+export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
   isRed(node: T): boolean {
     if (node == null) return false;
     return node.color == RED;
@@ -163,8 +165,8 @@ export class RedBlackTree<K extends Comparable<any>, V = any, T extends RBNode<K
 
     // 最后一种情况，被删黑色结点有两个 Nil 子结点，
     // 需要进行 fix up 流程
-    const nil = new RBNilNode(null, null) as T;
-    nil.color = BLACK;
+    const nil = new RBNilNode() as T;
+
     const parent = backtracking[0] as T;
     // 暂时用 RBNilNode 代替 null，便于后续旋转操作
     if (replacer == parent.left) {

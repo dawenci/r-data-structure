@@ -1,8 +1,8 @@
-import { Comparable, compare } from './Comparable';
+import { Comparable } from './Comparable';
 
 export type Nil = null
 
-export class Node<K extends Comparable<any>, V = any> {
+export class Node<K extends Comparable<K>, V = any> {
   /**
    * 左子结点指针
    *
@@ -38,7 +38,7 @@ export class Node<K extends Comparable<any>, V = any> {
   constructor(public key: K, public value: V) {}
 }
 
-export class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>> {
+export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>> {
   private _root: T | Nil = null
 
   private _size: number = 0
@@ -61,17 +61,6 @@ export class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node
    */
   get size() {
     return this._size
-  }
-
-  /**
-   * 是否叶子结点
-   *
-   * @readonly
-   * @type {boolean}
-   * @memberof Node
-   */
-  isLeaf(node: T): boolean {
-    return node.left === null && node.right === null
   }
 
   /// 设置左子结点，同时维护 parent 关系
@@ -269,7 +258,7 @@ export class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node
    * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  static *preorder<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(
+  static *preorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(
     root: T | Nil
   ): IterableIterator<T> {
     const stack: Array<T> = []
@@ -302,7 +291,7 @@ export class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node
    * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  static *inorder<K  extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T> {
+  static *inorder<K  extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T> {
     const stack: Array<T> = []
     let current: T | Nil = root
     while (stack.length || current) {
@@ -331,7 +320,7 @@ export class BinarySearchTree<K extends Comparable<any>, V = any, T extends Node
    * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  static *postorder<K extends Comparable<any>, V = any, T extends Node<K, V> = Node<K, V>>(
+  static *postorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(
     root: T | Nil
   ): IterableIterator<T> {
     const stack: Array<T> = []

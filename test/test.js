@@ -1,23 +1,33 @@
 const AVLTree = window.DTree.AVLTree
 const RBTree = window.DTree.RedBlackTree
+
 const testDatas = []
 const testDatas2 = []
+const testDatas3 = []
+
 let randomSearchOrder
 let randomSearchOrder2
+let randomSearchOrder3
 
-for (let i = 0; i < 100000; i += 1) {
+for (let i = 0; i < 50000; i += 1) {
   let value = Math.random()
   value = Math.ceil(value * 100000000)
   testDatas.push({value, compareTo(other) { return other.value - this.value }})
   testDatas2.push({value, compareTo(other) { return other.value - this.value }})
+  testDatas3.push({value, compareTo(other) { return other.value - this.value }})
 }
+
 randomSearchOrder = testDatas.slice()
 randomSearchOrder2 = testDatas2.slice()
+randomSearchOrder3 = testDatas3.slice()
+
 randomSearchOrder.sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
 randomSearchOrder2.sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
+randomSearchOrder3.sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
 
 const avl = new AVLTree()
 const rbt = new RBTree()
+const arr = []
 
 console.log('%c==============================================', 'color:#f80')
 console.time('AVL Tree total:')
@@ -72,3 +82,32 @@ console.log('%c==============================================', 'color:#f80')
 console.log('RB instance:', rbt)
 console.log('RB search:', searchResult2)
 console.log('RB traversal:', traversal2)
+
+
+
+
+console.log('%c==============================================', 'color:#f80')
+console.time('ARR total:')
+console.time('ARR insert')
+testDatas3.forEach((val) => arr.push(val))
+console.timeEnd('ARR insert')
+console.time('ARR search')
+const searchResult3 = []
+randomSearchOrder3.forEach((val) => {
+  searchResult3.push(arr.find(item => item === val))
+})
+console.timeEnd('ARR search')
+console.time('ARR traversal')
+let traversal3 = []
+arr.sort((a, b) => a.value - b.value).forEach((value, key, tree) => traversal3.push(value))
+console.timeEnd('ARR traversal')
+console.time('ARR delete')
+randomSearchOrder3.forEach(val => {
+  arr.splice(arr.indexOf(val), 1)
+})
+console.timeEnd('ARR delete')
+console.timeEnd('ARR total:')
+console.log('%c==============================================', 'color:#f80')
+console.log('ARR instance:', arr)
+console.log('ARR search:', searchResult3)
+console.log('ARR traversal:', traversal3)

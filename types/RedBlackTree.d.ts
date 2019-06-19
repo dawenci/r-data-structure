@@ -1,7 +1,7 @@
 import { Comparable } from './Comparable';
 import { Node, BinarySearchTree } from './BinarySearchTree';
 export declare type Color = boolean;
-export declare class RBNode<K extends Comparable<any>, V = any> extends Node<K, V> {
+export declare class RBNode<K extends Comparable<K>, V = any> extends Node<K, V> {
     /**
      * 结点颜色，新插入结点默认红色
      *
@@ -11,10 +11,10 @@ export declare class RBNode<K extends Comparable<any>, V = any> extends Node<K, 
     color: Color;
     constructor(key: K, value?: V);
 }
-export declare class RBNilNode<K extends Comparable<any>, V = any> extends RBNode<K, V> {
-    constructor(key: K, value?: V);
+export declare class RBNilNode<K extends Comparable<K>, V = any> extends RBNode<K, V> {
+    constructor();
 }
-export declare class RedBlackTree<K extends Comparable<any>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
+export declare class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
     isRed(node: T): boolean;
     isBlack(node: T): boolean;
     setBlack(node: T): void;
