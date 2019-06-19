@@ -1,6 +1,15 @@
 const AVLTree = window.DTree.AVLTree
 const RBTree = window.DTree.RedBlackTree
 
+class Key {
+  constructor(value) {
+    this.value = value;
+  }
+  compareTo(other) {
+    return other.value - this.value;
+  }
+}
+
 const testDatas = []
 const testDatas2 = []
 const testDatas3 = []
@@ -9,12 +18,12 @@ let randomSearchOrder
 let randomSearchOrder2
 let randomSearchOrder3
 
-for (let i = 0; i < 50000; i += 1) {
+for (let i = 0; i < 500000; i += 1) {
   let value = Math.random()
   value = Math.ceil(value * 100000000)
-  testDatas.push({value, compareTo(other) { return other.value - this.value }})
-  testDatas2.push({value, compareTo(other) { return other.value - this.value }})
-  testDatas3.push({value, compareTo(other) { return other.value - this.value }})
+  testDatas.push(new Key(value))
+  testDatas2.push(new Key(value))
+  testDatas3.push(new Key(value))
 }
 
 randomSearchOrder = testDatas.slice()
@@ -86,28 +95,28 @@ console.log('RB traversal:', traversal2)
 
 
 
-console.log('%c==============================================', 'color:#f80')
-console.time('ARR total:')
-console.time('ARR insert')
-testDatas3.forEach((val) => arr.push(val))
-console.timeEnd('ARR insert')
-console.time('ARR search')
-const searchResult3 = []
-randomSearchOrder3.forEach((val) => {
-  searchResult3.push(arr.find(item => item === val))
-})
-console.timeEnd('ARR search')
-console.time('ARR traversal')
-let traversal3 = []
-arr.sort((a, b) => a.value - b.value).forEach((value, key, tree) => traversal3.push(value))
-console.timeEnd('ARR traversal')
-console.time('ARR delete')
-randomSearchOrder3.forEach(val => {
-  arr.splice(arr.indexOf(val), 1)
-})
-console.timeEnd('ARR delete')
-console.timeEnd('ARR total:')
-console.log('%c==============================================', 'color:#f80')
-console.log('ARR instance:', arr)
-console.log('ARR search:', searchResult3)
-console.log('ARR traversal:', traversal3)
+// console.log('%c==============================================', 'color:#f80')
+// console.time('ARR total:')
+// console.time('ARR insert')
+// testDatas3.forEach((val) => arr.push(val))
+// console.timeEnd('ARR insert')
+// console.time('ARR search')
+// const searchResult3 = []
+// randomSearchOrder3.forEach((val) => {
+//   searchResult3.push(arr.find(item => item === val))
+// })
+// console.timeEnd('ARR search')
+// console.time('ARR traversal')
+// let traversal3 = []
+// arr.sort((a, b) => a.value - b.value).forEach((value, key, tree) => traversal3.push(value))
+// console.timeEnd('ARR traversal')
+// console.time('ARR delete')
+// randomSearchOrder3.forEach(val => {
+//   arr.splice(arr.indexOf(val), 1)
+// })
+// console.timeEnd('ARR delete')
+// console.timeEnd('ARR total:')
+// console.log('%c==============================================', 'color:#f80')
+// console.log('ARR instance:', arr)
+// console.log('ARR search:', searchResult3)
+// console.log('ARR traversal:', traversal3)
