@@ -6,7 +6,7 @@ class Key {
     this.value = value;
   }
   compareTo(other) {
-    return other.value - this.value;
+    return this.value - other.value;
   }
 }
 

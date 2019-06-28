@@ -748,7 +748,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
   nodeSearch(key: K): T | Nil {
     let current = this._root
     while (current !== null) {
-      let result = current.key.compareTo(key)
+      let result = key.compareTo(current.key)
       if (result === 0) return current
       if (result < 0) current = current.left
       else current = current.right
@@ -778,7 +778,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
 
     // 查找待插入的位置
     while (true) {
-      const result = current.key.compareTo(key)
+      const result = key.compareTo(current.key)
       if (result > 0) {
         if (current.right === null) {
           this.setRight(current, node)
