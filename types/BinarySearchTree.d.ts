@@ -384,5 +384,9 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {([T | Nil, T | Nil, T])}
      * @memberof BinarySearchTree
      */
-    nodeErase(node: T): [T | Nil, T | Nil, T];
+    nodeErase(node: T): {
+        parent: T | Nil;
+        child: T | Nil;
+        node: T;
+    };
 }

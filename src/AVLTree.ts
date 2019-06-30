@@ -148,7 +148,7 @@ export class AVLTree<K extends Comparable<K>, V = any, T extends AVLNode<K, V> =
 
     // 执行删除结点操作
     const backtracking = this.nodeErase(targetNode);
-    const parent = backtracking[0] as T | Nil;
+    const parent = backtracking.parent as T | Nil;
 
     // 回溯调整搜索路径上的结点
     if (parent !== null) {

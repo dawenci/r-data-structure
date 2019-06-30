@@ -827,7 +827,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {([T | Nil, T | Nil, T])}
    * @memberof BinarySearchTree
    */
-  nodeErase(node: T): [T | Nil, T | Nil, T] {
+  nodeErase(node: T): { parent: T|Nil, child: T|Nil, node: T } {
     // 同时拥有左右子树
     // 先转换成只有一颗子树的情况再统一处理
     if (node.left !== null && node.right !== null) {
@@ -852,6 +852,10 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
     this.replaceNode(node, child)
     this.decreaseSize()
 
-    return [ parent, child, node ]
+    return {
+      parent,
+      child,
+      node
+    }
   }
 }

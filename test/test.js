@@ -18,7 +18,7 @@ let randomSearchOrder
 let randomSearchOrder2
 let randomSearchOrder3
 
-for (let i = 0; i < 500000; i += 1) {
+for (let i = 0; i < 50000; i += 1) {
   let value = Math.random()
   value = Math.ceil(value * 100000000)
   testDatas.push(new Key(value))

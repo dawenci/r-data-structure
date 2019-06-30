@@ -143,7 +143,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     }
 
     // 被删结点
-    const removed = backtracking[2] as T;
+    const removed = backtracking.node as T;
 
     // 删掉的结点为红色，无需调整
     // 注：被删结点为红色时，该红色结点的两个黑色孩子必定是 Nil 节点
@@ -153,7 +153,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     }
 
     // 被删位置补位的结点
-    const replacer = backtracking[1] as T;
+    const replacer = backtracking.child as T;
 
     // 删掉的为黑色结点，上顶补位的子结点为红色时，
     // 则直接将该子结点染成黑色即可恢复红黑树性质
@@ -167,7 +167,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     // 需要进行 fix up 流程
     const nil = new RBNilNode() as T;
 
-    const parent = backtracking[0] as T;
+    const parent = backtracking.parent as T;
     // 暂时用 RBNilNode 代替 null，便于后续旋转操作
     if (replacer == parent.left) {
       this.setLeft(parent, nil);
