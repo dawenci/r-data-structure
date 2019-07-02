@@ -128,7 +128,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
 
   // @override
   insert(key: K, value?: V): void {
-    const node = new AVLNode(key, value) as T
+    const node = new AVLNode<K, V>(key, value) as T
     const insertPoint = this.nodeInsert(node)
     // 本次插入是重复结点，直接更新 key / value
     // 无新结点插入，所以无需进行插入后的调整
@@ -154,7 +154,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
 
     // 执行删除结点操作
     const backtracking = this.nodeErase(targetNode);
-    const parent = backtracking.parent as T | Nil;
+    const parent = backtracking.parent;
 
     // 回溯调整搜索路径上的结点
     if (parent !== null) {
@@ -193,7 +193,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
         break
       }
 
-      current = current.parent as T | Nil
+      current = current.parent
     }
   }
 
@@ -222,7 +222,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
 
       // 与插入不同，调整过后，仍然需要继续往上回溯
       // 上层结点（若有）仍需判断是否需要调整
-      current = current.parent as T | Nil
+      current = current.parent
     }
   }
 
@@ -259,8 +259,8 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
    * @memberof AVLTree
    */
   private _adjustLeftRight(node: T): T {
-    this.rotateLeft(node.left as T)
-    return this.rotateRight(node) as T
+    this.rotateLeft(node.left)
+    return this.rotateRight(node)
   }
 
   /**
@@ -272,8 +272,8 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
    * @memberof AVLTree
    */
   private _adjustRightLeft(node: T): T {
-    this.rotateRight(node.right as T)
-    return this.rotateLeft(node) as T
+    this.rotateRight(node.right)
+    return this.rotateLeft(node)
   }
 
   /**
@@ -301,7 +301,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
     const factor = node.balanceFactor
     // Right subtree longer (node.factor: -2)
     if (factor === UNBALANCED_RIGHT) {
-      let right = node.right as T
+      let right = node.right
       // RL, node.right.factor: 1
       if (right.balanceFactor === SLIGHTLY_UNBALANCED_LEFT) {
         return this._adjustRightLeft(node)
@@ -314,7 +314,7 @@ export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends B
     }
     else if (factor === UNBALANCED_LEFT) {
       // Left subtree longer (node.factor: 2)
-      let left = node.left as T
+      let left = node.left
       // LR, node.left.factor: -1
       if (left.balanceFactor === SLIGHTLY_UNBALANCED_RIGHT) {
         return this._adjustLeftRight(node)

@@ -47,7 +47,7 @@ export declare class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V
      *
      *
      * @private
-     * @param {T} RBNil
+     * @param {T} nil
      * @memberof RedBlackTree
      */
     private _removeFixUp;

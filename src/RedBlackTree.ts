@@ -97,7 +97,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     }
 
     // 被删结点
-    const removed = backtracking.node as T;
+    const removed = backtracking.node
 
     // 删掉的结点为红色，无需调整
     // 注：被删结点为红色时，该红色结点的两个黑色孩子必定是 Nil 节点
@@ -107,7 +107,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     }
 
     // 被删位置补位的结点
-    const replacer = backtracking.child as T;
+    const replacer = backtracking.child
 
     // 删掉的为黑色结点，上顶补位的子结点为红色时，
     // 则直接将该子结点染成黑色即可恢复红黑树性质
@@ -121,7 +121,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // 需要进行 fix up 流程
     const nil = this._nil();
 
-    const parent = backtracking.parent as T;
+    const parent = backtracking.parent
     // 暂时用 RBNilNode 代替 null，便于后续旋转操作
     if (replacer == parent.left) {
       this.setLeft(parent, nil);
@@ -155,7 +155,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
       let parentIsLeft = parent === grandparent.left
 
       // 获取叔结点，叔结点可能为红也可能为黑
-      let uncle = parentIsLeft ? grandparent.right : grandparent.left as T | Nil
+      let uncle = parentIsLeft ? grandparent.right : grandparent.left
 
       /**
        * 情况 1: 叔结点为红色，颜色翻转 (color flips) 即可：
@@ -251,17 +251,17 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
    * 
    *
    * @private
-   * @param {T} RBNil
+   * @param {T} nil
    * @memberof RedBlackTree
    */
-  private _removeFixUp(RBNil: T) {
+  private _removeFixUp(nil: T) {
     // 传进来的 replacer 必定为 Nil
-    let current = RBNil as T
-    while (current.parent !== null && current.parent !== RBNil) {
+    let current = nil
+    while (current.parent !== null && current.parent !== nil) {
       let parent = current.parent
       let currentIsLeft = current === parent.left
       let siblingIsLeft = !currentIsLeft
-      let sibling = (currentIsLeft ? parent.right : parent.left) as T
+      let sibling = (currentIsLeft ? parent.right : parent.left)
 
       // sibling 黑色
       if (sibling === null || sibling.color === BLACK) {
@@ -291,8 +291,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
 
           parent.color = BLACK
           outwardSon.color = BLACK
-          if (current === RBNil) {
-            this.replaceNode(RBNil, null)
+          if (current === nil) {
+            this.replaceNode(nil, null)
           }
           else {
             current.color = BLACK
@@ -328,8 +328,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           if (parent !== null && parent.color === RED) {
             parent.color = BLACK
             sibling.color = RED
-            if (current === RBNil) {
-              this.replaceNode(RBNil, null)
+            if (current === nil) {
+              this.replaceNode(nil, null)
             }
             else {
               current.color = BLACK
@@ -339,8 +339,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           else {
             // Case 3.2
             // 否则 parent 为黑色, 将额外的黑色存到father, 重新着色 sibling，并上移指针回溯循环
-            if (current === RBNil) {
-              this.replaceNode(RBNil, null)
+            if (current === nil) {
+              this.replaceNode(nil, null)
             }
             else {
               current.color = BLACK

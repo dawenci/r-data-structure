@@ -51,35 +51,6 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
      */
     inorderPredecessor(node: T): T | Nil;
     /**
-     * Gets the minimum value node, rooted in a particular node.
-     *
-     * @param {T} subRoot The node to search.
-     * @returns {T} The node with the minimum value in the tree.
-     * @memberof BinarySearchTree
-     */
-    _minimumNode(subRoot: T): T;
-    /**
-     * Gets the maximum value node, rooted in a particular node.
-     *
-     * @param {T} subRoot The node to search.
-     * @returns {T} The node with the maximum value in the tree.
-     * @memberof BinarySearchTree
-     */
-    _maximumNode(subRoot: T): T;
-    _setRoot(node: T): void;
-    /**
-     * 增加结点数量
-     *
-     * @memberof BinarySearchTree
-     */
-    _increaseSize(): void;
-    /**
-     * 减少结点数量
-     *
-     * @memberof BinarySearchTree
-     */
-    _decreaseSize(): void;
-    /**
      * 清空树
      *
      * @memberof BinarySearchTree
@@ -331,4 +302,33 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
         child: T | Nil;
         node: T;
     };
+    /**
+     * Gets the minimum value node, rooted in a particular node.
+     *
+     * @param {T} subRoot The node to search.
+     * @returns {T} The node with the minimum value in the tree.
+     * @memberof BinarySearchTree
+     */
+    private _minimumNode;
+    /**
+     * Gets the maximum value node, rooted in a particular node.
+     *
+     * @param {T} subRoot The node to search.
+     * @returns {T} The node with the maximum value in the tree.
+     * @memberof BinarySearchTree
+     */
+    private _maximumNode;
+    private _setRoot;
+    /**
+     * 增加结点数量
+     *
+     * @memberof BinarySearchTree
+     */
+    private _increaseSize;
+    /**
+     * 减少结点数量
+     *
+     * @memberof BinarySearchTree
+     */
+    private _decreaseSize;
 }

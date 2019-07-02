@@ -134,69 +134,6 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
-   * Gets the minimum value node, rooted in a particular node.
-   *
-   * @param {T} subRoot The node to search.
-   * @returns {T} The node with the minimum value in the tree.
-   * @memberof BinarySearchTree
-   */
-  _minimumNode(subRoot: T): T {
-    let current = subRoot
-    while (current.left !== null) {
-      current = current.left
-    }
-    return current
-  }
-
-  /**
-   * Gets the maximum value node, rooted in a particular node.
-   *
-   * @param {T} subRoot The node to search.
-   * @returns {T} The node with the maximum value in the tree.
-   * @memberof BinarySearchTree
-   */
-  _maximumNode(subRoot: T): T {
-    let current = subRoot
-    while (current.right !== null) {
-      current = current.right
-    }
-    return current
-  }
-
-  /// 设置根结点
-  _setRoot(node: T): void {
-    if (node === null) {
-      this._root = null;
-      return;
-    }
-    this._root = node;
-    // 如果本身在树中，则从树中脱落，成为独立的树根
-    if (node.parent !== null) {
-      node.parent.left === node 
-        ? (node.parent.left = null)
-        : (node.parent.right = null);
-      node.parent = null;
-    }
-  }
-
-  /**
-   * 增加结点数量
-   *
-   * @memberof BinarySearchTree
-   */
-  _increaseSize(): void {
-    this._size += 1
-  }
-  /**
-   * 减少结点数量
-   *
-   * @memberof BinarySearchTree
-   */
-  _decreaseSize(): void {
-    this._size -= 1
-  }
-
-  /**
    * 清空树
    *
    * @memberof BinarySearchTree
@@ -568,7 +505,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
     }
     else {
       // 非 root，有父结点的情况
-      const parent = node.parent as T
+      const parent = node.parent
       if (parent.left === node) this.setLeft(parent, replacer)
       else this.setRight(parent, replacer)
     }
@@ -737,12 +674,16 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    * @returns {([T | Nil, T | Nil, T])}
    * @memberof BinarySearchTree
    */
-  nodeErase(node: T): { parent: T | Nil, child: T | Nil, node: T } {
+  nodeErase(node: T): {
+    parent: T | Nil,
+    child: T | Nil,
+    node: T
+  } {
     // 同时拥有左右子树
     // 先转换成只有一颗子树的情况再统一处理
     if (node.left !== null && node.right !== null) {
-      // OR const replacer = this.inorderSuccessor(node) as T
-      const replacer = this.inorderPredecessor(node) as T
+      // OR const replacer = this.inorderSuccessor(node)
+      const replacer = this.inorderPredecessor(node)
 
       // 使用前驱结点替换身份
       // 此时问题转换成删掉替代结点（前驱），
@@ -767,5 +708,68 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
       child,
       node
     }
+  }
+
+  /**
+   * Gets the minimum value node, rooted in a particular node.
+   *
+   * @param {T} subRoot The node to search.
+   * @returns {T} The node with the minimum value in the tree.
+   * @memberof BinarySearchTree
+   */
+  private _minimumNode(subRoot: T): T {
+    let current = subRoot
+    while (current.left !== null) {
+      current = current.left
+    }
+    return current
+  }
+
+  /**
+   * Gets the maximum value node, rooted in a particular node.
+   *
+   * @param {T} subRoot The node to search.
+   * @returns {T} The node with the maximum value in the tree.
+   * @memberof BinarySearchTree
+   */
+  private _maximumNode(subRoot: T): T {
+    let current = subRoot
+    while (current.right !== null) {
+      current = current.right
+    }
+    return current
+  }
+
+  /// 设置根结点
+  private _setRoot(node: T): void {
+    if (node === null) {
+      this._root = null;
+      return;
+    }
+    this._root = node;
+    // 如果本身在树中，则从树中脱落，成为独立的树根
+    if (node.parent !== null) {
+      node.parent.left === node 
+        ? (node.parent.left = null)
+        : (node.parent.right = null);
+      node.parent = null;
+    }
+  }
+
+  /**
+   * 增加结点数量
+   *
+   * @memberof BinarySearchTree
+   */
+  private _increaseSize(): void {
+    this._size += 1
+  }
+  /**
+   * 减少结点数量
+   *
+   * @memberof BinarySearchTree
+   */
+  private _decreaseSize(): void {
+    this._size -= 1
   }
 }
