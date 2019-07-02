@@ -12,13 +12,19 @@
  */
 
 import { Comparable } from './Comparable'
-import { Node, Nil, BinarySearchTree } from './BinarySearchTree'
+import { BinarySearchTree } from './BinarySearchTree'
+import { Node, Nil } from './Node'
 
-const RED = true
-const BLACK = false
-export type Color = boolean
+const RED = 1
+const BLACK = 0
+export type Color = number
 
-export class RBNode<K extends Comparable<K>, V = any> extends Node<K, V> {
+export class RBNode<K extends Comparable, V> implements Node<K, V> {
+  parent: this = null
+  left: this = null
+  right: this = null
+  constructor(public key: K, public value?: V) {}
+
   /**
    * 结点颜色，新插入结点默认红色
    *
@@ -26,61 +32,9 @@ export class RBNode<K extends Comparable<K>, V = any> extends Node<K, V> {
    * @memberof RBNode
    */
   color: Color = RED
-
-  constructor(key: K, value?: V) {
-    super(key, value)
-  }
 }
 
-const NilKey = { compareTo: (other) => 0 }
-export class RBNilNode<K extends Comparable<K>, V = any> extends RBNode<K, V> {
-  constructor() {
-    super(NilKey as K, null);
-    this.color = BLACK
-  }
-}
-
-export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
-  isRed(node: T): boolean {
-    if (node == null) return false;
-    return node.color == RED;
-  }
-
-  isBlack(node: T): boolean {
-    if (node == null) return true;
-    return node.color == BLACK;
-  }
-
-  setBlack(node: T): void {
-    if (node != null) node.color = BLACK;
-  }
-
-  setRed(node: T): void {
-    if (node != null) node.color = RED;
-  }
-
-  /// 获取兄弟结点
-  getSibling(node: T): T {
-    const parent = node.parent;
-    if (parent === null) return null;
-    return parent.left === node
-      ? parent.right
-      : parent.left;
-  }
-
-  /// 获取叔叔结点
-  getUncle(node: T): T {
-    if (node.parent === null) return null;
-    return this.getSibling(node.parent);
-  }
-
-  /// 获取祖父结点
-  getGrandparent(node: T): T {
-    if (node.parent === null) return null;
-    return node.parent.parent;
-  }    
-
-
+export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> extends BinarySearchTree<K, V, T> {
   /**
    * Inserts a new node with a specific key and value into the tree.
    *
@@ -92,7 +46,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
   // @override
   insert(key: K, value?: V): void {
     // 插入的结点为红色，因为插入红色结点不会破坏性质 5)，需要修复的情况只有 4)。
-    const insert = new RBNode(key, value) as T;
+    const insert = new RBNode<K, V>(key, value) as T;
     // 返回插入点
     const insertPoint = this.nodeInsert(insert);
 
@@ -111,7 +65,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     // B. 插入的是红色的，因此：
     // 结合 A，B，只有 parent 为红色，才可能破坏性质 4)
     // 2. parent 是黑色的，无需调整
-    if (this.isBlack(insertPoint)) {
+    if (insertPoint === null || insertPoint.color === BLACK) {
       return;
     }
 
@@ -148,7 +102,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     // 删掉的结点为红色，无需调整
     // 注：被删结点为红色时，该红色结点的两个黑色孩子必定是 Nil 节点
     // 否则被删前不符合性质 5)
-    if (this.isRed(removed)) {
+    if (removed.color === RED) {
       return true;
     }
 
@@ -158,14 +112,14 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     // 删掉的为黑色结点，上顶补位的子结点为红色时，
     // 则直接将该子结点染成黑色即可恢复红黑树性质
     // 注：被删的黑色结点要么只有一个红色子结点，要么有两个 Nil 子结点
-    if (this.isRed(replacer)) {
+    if (replacer !== null && replacer.color === RED) {
       replacer.color = BLACK;
       return true;
     }
 
     // 最后一种情况，被删黑色结点有两个 Nil 子结点，
     // 需要进行 fix up 流程
-    const nil = new RBNilNode() as T;
+    const nil = this._nil();
 
     const parent = backtracking.parent as T;
     // 暂时用 RBNilNode 代替 null，便于后续旋转操作
@@ -193,7 +147,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     // 1. 插入结点为红色
     // 2. 父节点为红色
     // 3. 祖父结点为黑色
-    while (this.isRed(parent)) {
+    while (parent !== null && parent.color === RED) {
       // 祖父总是非空的（父节点为红，必定有黑色的祖父结点）
       let grandparent = parent.parent!
 
@@ -217,7 +171,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
        *
        * 但因为 g 的父结点也可能为红色，而规则 4) 不允许这种情况，所以需要回溯处理 g（此时的情况相当于插入了红色的 g）.
        */
-      if (this.isRed(uncle)) {
+      if (uncle !== null && uncle.color === RED) {
         parent.color = BLACK
         uncle.color = BLACK
         grandparent.color = RED
@@ -310,7 +264,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
       let sibling = (currentIsLeft ? parent.right : parent.left) as T
 
       // sibling 黑色
-      if (this.isBlack(sibling)) {
+      if (sibling === null || sibling.color === BLACK) {
         // Case 1: sibling 为黑色，且 sibling 有一个与其方向一致的红色子结点 sr OR sl
         //
         //       p?              s?
@@ -323,7 +277,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
         // 旋转和着色后完成删除
         let outwardSon = siblingIsLeft ? sibling.left : sibling.right
         let inwardSon = siblingIsLeft ? sibling.right : sibling.left
-        if (this.isRed(outwardSon)) {
+        if (outwardSon !== null && outwardSon.color === RED) {
           if (siblingIsLeft) {
             this.rotateRight(parent)
           }
@@ -332,7 +286,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
           }
 
           // 将 parent 的颜色转移到 sibling
-          if (this.isRed(parent)) sibling.color = RED
+          if (parent !== null && parent.color === RED) sibling.color = RED
           else sibling.color = BLACK
 
           parent.color = BLACK
@@ -345,7 +299,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
           }
           return
         }
-        else if (this.isRed(inwardSon)) {
+        else if (inwardSon !== null && inwardSon.color === RED) {
           // Case 2:
           // sibling 为黑色，且 sibling 有一个与其方向不一致的红色子结点 sr OR sl
           //
@@ -371,7 +325,7 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
           //     (p)           P
           //    /  \  --->    / \
           //  NIL  S        NIL (s)
-          if (this.isRed(parent)) {
+          if (parent !== null && parent.color === RED) {
             parent.color = BLACK
             sibling.color = RED
             if (current === RBNil) {
@@ -414,5 +368,11 @@ export class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, 
     }
 
     if (this.root !== null) (this.root as T).color = BLACK
+  }
+
+  private _nil(): T {
+    const nil = new RBNode({ compareTo: (other: any) => 0 }, null)
+    nil.color = BLACK
+    return nil as T
   }
 }

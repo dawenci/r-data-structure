@@ -1,7 +1,13 @@
 import { Comparable } from './Comparable'
-import { Node, Nil, BinarySearchTree } from './BinarySearchTree'
+import { BinarySearchTree } from './BinarySearchTree'
+import { Node, Nil } from './Node'
 
-export class AVLNode<K extends Comparable<K>, V = any> extends Node<K, V> {
+export class AVLNode<K extends Comparable, V> implements Node<K, V> {
+  parent: this = null
+  left: this = null
+  right: this = null
+  constructor(public key: K, public value?: V) {}
+
   /**
    * 记录高度
    *
@@ -103,7 +109,7 @@ const SLIGHTLY_UNBALANCED_LEFT = 1
 const UNBALANCED_RIGHT = -2
 const UNBALANCED_LEFT = 2
 
-export class AVLTree<K extends Comparable<K>, V = any, T extends AVLNode<K, V> = AVLNode<K, V>> extends BinarySearchTree<K, V, T> {
+export class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends BinarySearchTree<K, V, T> {
   // @override
   rotateRight(node: T): T {
     const pivot = super.rotateRight(node);

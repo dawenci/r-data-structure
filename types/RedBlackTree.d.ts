@@ -1,7 +1,14 @@
 import { Comparable } from './Comparable';
-import { Node, BinarySearchTree } from './BinarySearchTree';
-export declare type Color = boolean;
-export declare class RBNode<K extends Comparable<K>, V = any> extends Node<K, V> {
+import { BinarySearchTree } from './BinarySearchTree';
+import { Node } from './Node';
+export declare type Color = number;
+export declare class RBNode<K extends Comparable, V> implements Node<K, V> {
+    key: K;
+    value?: V;
+    parent: this;
+    left: this;
+    right: this;
+    constructor(key: K, value?: V);
     /**
      * 结点颜色，新插入结点默认红色
      *
@@ -9,19 +16,8 @@ export declare class RBNode<K extends Comparable<K>, V = any> extends Node<K, V>
      * @memberof RBNode
      */
     color: Color;
-    constructor(key: K, value?: V);
 }
-export declare class RBNilNode<K extends Comparable<K>, V = any> extends RBNode<K, V> {
-    constructor();
-}
-export declare class RedBlackTree<K extends Comparable<K>, V = any, T extends RBNode<K, V> = RBNode<K, V>> extends BinarySearchTree<K, V, T> {
-    isRed(node: T): boolean;
-    isBlack(node: T): boolean;
-    setBlack(node: T): void;
-    setRed(node: T): void;
-    getSibling(node: T): T;
-    getUncle(node: T): T;
-    getGrandparent(node: T): T;
+export declare class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> extends BinarySearchTree<K, V, T> {
     /**
      * Inserts a new node with a specific key and value into the tree.
      *
@@ -55,4 +51,5 @@ export declare class RedBlackTree<K extends Comparable<K>, V = any, T extends RB
      * @memberof RedBlackTree
      */
     private _removeFixUp;
+    private _nil;
 }

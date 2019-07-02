@@ -1,5 +1,4 @@
 import { Comparable, Comparator, compare } from './Comparable';
-import { Node, BinarySearchTree } from './BinarySearchTree';
-import { AVLNode, AVLTree } from './AVLTree';
-import { RBNode, RedBlackTree } from './RedBlackTree';
-export { Node, AVLNode, RBNode, BinarySearchTree, AVLTree, RedBlackTree, Comparable, Comparator, compare };
+import { AVLTree } from './AVLTree';
+import { RedBlackTree } from './RedBlackTree';
+export { AVLTree, RedBlackTree, Comparable, Comparator, compare };

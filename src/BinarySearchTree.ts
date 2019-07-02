@@ -1,44 +1,7 @@
 import { Comparable } from './Comparable';
+import { Node, Nil } from './Node';
 
-export type Nil = null
-
-export class Node<K extends Comparable<K>, V = any> {
-  /**
-   * 左子结点指针
-   *
-   * @type {(this | Nil)}
-   * @memberof Node
-   */
-  left: this | Nil = null
-
-  /**
-   * 右子结点指针
-   *
-   * @type {(this | Nil)}
-   * @memberof Node
-   */
-  right: this | Nil = null
-
-  /**
-   * 父结点指针
-   * 只通过设置 left、right 设定该属性
-   * 避免手动维护增加复杂性
-   *
-   * @type {(this | Nil)}
-   * @memberof Node
-   */
-  parent: this | Nil = null
-
-  /**
-   * Creates an instance of Node.
-   * @param {*} key
-   * @param {*} value
-   * @memberof Node
-   */
-  constructor(public key: K, public value: V) {}
-}
-
-export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>> {
+export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K, V>> {
   private _root: T | Nil = null
 
   private _size: number = 0
@@ -119,7 +82,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
     if (node === null) return null;
     // 1. 有右子树，找到右子树最小元素
     if (node.right !== null) {
-      return this.minimumNode(node.right);
+      return this._minimumNode(node.right);
     }
     // 2. 没有右子树，往上搜索
     let parent = node.parent;
@@ -153,7 +116,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
 
     // 1. 有左子树，找到左子树最大元素
     if (node.left !== null) {
-      return this.maximumNode(node.left);
+      return this._maximumNode(node.left);
     }
 
     // 2. 没有左子树，往上搜索
@@ -177,9 +140,11 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {T} The node with the minimum value in the tree.
    * @memberof BinarySearchTree
    */
-  minimumNode(subRoot: T): T {
-    let current: T | Nil = subRoot
-    while (current.left !== null) current = current.left
+  _minimumNode(subRoot: T): T {
+    let current = subRoot
+    while (current.left !== null) {
+      current = current.left
+    }
     return current
   }
 
@@ -190,14 +155,16 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {T} The node with the maximum value in the tree.
    * @memberof BinarySearchTree
    */
-  maximumNode(subRoot: T): T {
-    let current: T | Nil = subRoot
-    while (current.right !== null) current = current.right
+  _maximumNode(subRoot: T): T {
+    let current = subRoot
+    while (current.right !== null) {
+      current = current.right
+    }
     return current
   }
 
   /// 设置根结点
-  setRoot(node: T): void {
+  _setRoot(node: T): void {
     if (node === null) {
       this._root = null;
       return;
@@ -217,7 +184,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    *
    * @memberof BinarySearchTree
    */
-  increaseSize() {
+  _increaseSize(): void {
     this._size += 1
   }
   /**
@@ -225,7 +192,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    *
    * @memberof BinarySearchTree
    */
-  decreaseSize() {
+  _decreaseSize(): void {
     this._size -= 1
   }
 
@@ -236,54 +203,12 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   clear(): void {
     this._size = 0
-    this.setRoot(null)
-  }
-
-
-
-
-
-
-
-
-
-  /**
-   * 前序遍历迭代器
-   *
-   * @static
-   * @template K
-   * @template V
-   * @template T
-   * @param {(T | Nil)} root
-   * @returns {IterableIterator<T>}
-   * @memberof BinarySearchTree
-   */
-  static *preorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(
-    root: T | Nil
-  ): IterableIterator<T> {
-    const stack: Array<T> = []
-    let current: T | Nil = root
-    while (stack.length || current) {
-      // 存入栈中，以后需要借助这些根结点进入右子树
-      while (current) {
-        yield current
-        stack.push(current)
-        if (!current.left) break
-        current = current.left
-      }
-      // 当 p 为空时，说明根和左子树都遍历完了，该进入右子树了
-      if (stack.length) {
-        current = stack[stack.length - 1]
-        stack.pop()
-        current = current.right
-      }
-    }
+    this._setRoot(null)
   }
 
   /**
    * 中序遍历迭代器
    *
-   * @static
    * @template K
    * @template V
    * @template T
@@ -291,7 +216,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  static *inorder<K  extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T> {
+  *inorder(root: T | Nil): IterableIterator<T> {
     const stack: Array<T> = []
     let current: T | Nil = root
     while (stack.length || current) {
@@ -312,7 +237,6 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
   /**
    * 后续遍历迭代器
    *
-   * @static
    * @template K
    * @template V
    * @template T
@@ -320,9 +244,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  static *postorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(
-    root: T | Nil
-  ): IterableIterator<T> {
+  *postorder(root: T | Nil): IterableIterator<T> {
     const stack: Array<T> = []
     // 当前访问的结点
     let current: T | Nil = root
@@ -361,34 +283,35 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
   }
 
   /**
-   * 获取根结点的前序遍历迭代器
+   * 前序遍历迭代器
    *
-   * @returns
+   * @template K
+   * @template V
+   * @template T
+   * @param {(T | Nil)} root
+   * @returns {IterableIterator<T>}
    * @memberof BinarySearchTree
    */
-  public preorder() {
-    return BinarySearchTree.preorder(this._root)
+  *preorder(root: T | Nil): IterableIterator<T> {
+    const stack: Array<T> = []
+    let current: T | Nil = root
+    while (stack.length || current) {
+      // 存入栈中，以后需要借助这些根结点进入右子树
+      while (current) {
+        yield current
+        stack.push(current)
+        if (!current.left) break
+        current = current.left
+      }
+      // 当 p 为空时，说明根和左子树都遍历完了，该进入右子树了
+      if (stack.length) {
+        current = stack[stack.length - 1]
+        stack.pop()
+        current = current.right
+      }
+    }
   }
 
-  /**
-   * 获取根结点的中序遍历迭代器
-   *
-   * @returns
-   * @memberof BinarySearchTree
-   */
-  public inorder() {
-    return BinarySearchTree.inorder(this._root)
-  }
-
-  /**
-   * 获取根结点的后续遍历迭代器
-   *
-   * @returns
-   * @memberof BinarySearchTree
-   */
-  public postorder() {
-    return BinarySearchTree.postorder(this._root)
-  }
 
   /**
    * 迭代器执行器
@@ -421,7 +344,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @memberof BinarySearchTree
    */
   *[Symbol.iterator]() {
-    const iterator = this.inorder()
+    const iterator = this.inorder(this._root)
     for (let node of iterator) yield [ node.key, node.value ]
   }
 
@@ -431,7 +354,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @memberof BinarySearchTree
    */
   *keys() {
-    const iterator = this.inorder()
+    const iterator = this.inorder(this._root)
     for (let node of iterator) yield node.key
   }
 
@@ -441,7 +364,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @memberof BinarySearchTree
    */
   *values() {
-    const iterator = this.inorder()
+    const iterator = this.inorder(this._root)
     for (let node of iterator) yield node.value
   }
 
@@ -464,7 +387,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @memberof BinarySearchTree
    */
   forEach(iteratee: (value: V, key: K, tree: this) => false | void, thisArg?: any) {
-    return this.baseFor(this.inorder(), iteratee, thisArg)
+    return this.baseFor(this.inorder(this._root), iteratee, thisArg)
   }
 
   /**
@@ -511,7 +434,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   minimum(): { key: K, value: V } | undefined {
     if (this._root === null) return;
-    const node = this.minimumNode(this._root)
+    const node = this._minimumNode(this._root)
     return { key: node.key, value: node.value }
   }
 
@@ -523,7 +446,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   maximum(): { key: K, value: V } {
     if (this._root === null) return
-    const node = this.minimumNode(this._root)
+    const node = this._minimumNode(this._root)
     return { key: node.key, value: node.value }
   }
 
@@ -535,7 +458,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   minimumKey(): K {
     if (this._root === null) return
-    return this.minimumNode(this._root).key
+    return this._minimumNode(this._root).key
   }
 
   /**
@@ -546,7 +469,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   maximumKey(): K {
     if (this._root === null) return
-    return this.maximumNode(this._root).key
+    return this._maximumNode(this._root).key
   }
 
   /**
@@ -557,7 +480,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   minimumValue(): V {
     if (this._root === null) return
-    return this.minimumNode(this._root).value
+    return this._minimumNode(this._root).value
   }
 
   /**
@@ -568,7 +491,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    */
   maximumValue(): V {
     if (this._root === null) return
-    return this.maximumNode(this._root).value
+    return this._maximumNode(this._root).value
   }
 
   /**
@@ -616,10 +539,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @param {V} [value]
    * @memberof BinarySearchTree
    */
-  insert(key: K, value?: V): void {
-    const node = new Node(key, value) as T
-    this.nodeInsert(node)
-  }
+  abstract insert(key: K, value?: V): void
 
   /**
    * Deletes a node with a specific key from the tree.
@@ -628,17 +548,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {boolean}
    * @memberof BinarySearchTree
    */
-  delete(key: K): boolean {
-    // 搜索待删除结点
-    const targetNode = this.nodeSearch(key)
-    // 未找到 value 对应结点
-    if (targetNode === null) return false
-
-    // 执行删除结点操作
-    this.nodeErase(targetNode)
-
-    return true
-  }
+  abstract delete(key: K): boolean
 
   /**
    * 将树上某个结点替换成另一个结点
@@ -654,7 +564,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
 
     // node 为 root 的情况
     if (node === this._root) {
-      this.setRoot(replacer)
+      this._setRoot(replacer)
     }
     else {
       // 非 root，有父结点的情况
@@ -696,7 +606,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
 
     // ---
     if (node === this._root) {
-      this.setRoot(pivot);
+      this._setRoot(pivot);
     }
     return pivot;
   }
@@ -731,7 +641,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
 
     // ---
     if (node === this._root) {
-      this.setRoot(pivot);
+      this._setRoot(pivot);
     }
     return pivot;
   }
@@ -768,8 +678,8 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
   nodeInsert(node: T): T {
     // 空树
     if (this._root === null) {
-      this.setRoot(node)
-      this.increaseSize()
+      this._setRoot(node)
+      this._increaseSize()
       return null
     }
 
@@ -782,7 +692,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
       if (result > 0) {
         if (current.right === null) {
           this.setRight(current, node)
-          this.increaseSize();
+          this._increaseSize();
           return current;
         }
         current = current.right
@@ -790,7 +700,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
       else if (result < 0) {
         if (current.left === null) {
           this.setLeft(current, node)
-          this.increaseSize();
+          this._increaseSize();
           return current;
         }
         current = current.left
@@ -827,11 +737,11 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
    * @returns {([T | Nil, T | Nil, T])}
    * @memberof BinarySearchTree
    */
-  nodeErase(node: T): { parent: T|Nil, child: T|Nil, node: T } {
+  nodeErase(node: T): { parent: T | Nil, child: T | Nil, node: T } {
     // 同时拥有左右子树
     // 先转换成只有一颗子树的情况再统一处理
     if (node.left !== null && node.right !== null) {
-      // OR const replacer = BinarySearchTree.inorderSuccessor(node) as Node
+      // OR const replacer = this.inorderSuccessor(node) as T
       const replacer = this.inorderPredecessor(node) as T
 
       // 使用前驱结点替换身份
@@ -850,7 +760,7 @@ export class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K
     // 待删结点少于两颗子树时，使用子树 (或 null，没子树时) 顶替移除的结点即可
     const child = node.left || node.right
     this.replaceNode(node, child)
-    this.decreaseSize()
+    this._decreaseSize()
 
     return {
       parent,

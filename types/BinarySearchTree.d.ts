@@ -1,41 +1,7 @@
 /// <reference types="node" />
 import { Comparable } from './Comparable';
-export declare type Nil = null;
-export declare class Node<K extends Comparable<K>, V = any> {
-    key: K;
-    value: V;
-    /**
-     * 左子结点指针
-     *
-     * @type {(this | Nil)}
-     * @memberof Node
-     */
-    left: this | Nil;
-    /**
-     * 右子结点指针
-     *
-     * @type {(this | Nil)}
-     * @memberof Node
-     */
-    right: this | Nil;
-    /**
-     * 父结点指针
-     * 只通过设置 left、right 设定该属性
-     * 避免手动维护增加复杂性
-     *
-     * @type {(this | Nil)}
-     * @memberof Node
-     */
-    parent: this | Nil;
-    /**
-     * Creates an instance of Node.
-     * @param {*} key
-     * @param {*} value
-     * @memberof Node
-     */
-    constructor(key: K, value: V);
-}
-export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>> {
+import { Node, Nil } from './Node';
+export declare abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K, V>> {
     private _root;
     private _size;
     /**
@@ -91,7 +57,7 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {T} The node with the minimum value in the tree.
      * @memberof BinarySearchTree
      */
-    minimumNode(subRoot: T): T;
+    _minimumNode(subRoot: T): T;
     /**
      * Gets the maximum value node, rooted in a particular node.
      *
@@ -99,20 +65,20 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {T} The node with the maximum value in the tree.
      * @memberof BinarySearchTree
      */
-    maximumNode(subRoot: T): T;
-    setRoot(node: T): void;
+    _maximumNode(subRoot: T): T;
+    _setRoot(node: T): void;
     /**
      * 增加结点数量
      *
      * @memberof BinarySearchTree
      */
-    increaseSize(): void;
+    _increaseSize(): void;
     /**
      * 减少结点数量
      *
      * @memberof BinarySearchTree
      */
-    decreaseSize(): void;
+    _decreaseSize(): void;
     /**
      * 清空树
      *
@@ -120,21 +86,8 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      */
     clear(): void;
     /**
-     * 前序遍历迭代器
-     *
-     * @static
-     * @template K
-     * @template V
-     * @template T
-     * @param {(T | Nil)} root
-     * @returns {IterableIterator<T>}
-     * @memberof BinarySearchTree
-     */
-    static preorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
-    /**
      * 中序遍历迭代器
      *
-     * @static
      * @template K
      * @template V
      * @template T
@@ -142,11 +95,10 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    static inorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
+    inorder(root: T | Nil): IterableIterator<T>;
     /**
      * 后续遍历迭代器
      *
-     * @static
      * @template K
      * @template V
      * @template T
@@ -154,28 +106,18 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    static postorder<K extends Comparable<K>, V = any, T extends Node<K, V> = Node<K, V>>(root: T | Nil): IterableIterator<T>;
+    postorder(root: T | Nil): IterableIterator<T>;
     /**
-     * 获取根结点的前序遍历迭代器
+     * 前序遍历迭代器
      *
-     * @returns
+     * @template K
+     * @template V
+     * @template T
+     * @param {(T | Nil)} root
+     * @returns {IterableIterator<T>}
      * @memberof BinarySearchTree
      */
-    preorder(): IterableIterator<T>;
-    /**
-     * 获取根结点的中序遍历迭代器
-     *
-     * @returns
-     * @memberof BinarySearchTree
-     */
-    inorder(): IterableIterator<T>;
-    /**
-     * 获取根结点的后续遍历迭代器
-     *
-     * @returns
-     * @memberof BinarySearchTree
-     */
-    postorder(): IterableIterator<T>;
+    preorder(root: T | Nil): IterableIterator<T>;
     /**
      * 迭代器执行器
      *
@@ -320,7 +262,7 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @param {V} [value]
      * @memberof BinarySearchTree
      */
-    insert(key: K, value?: V): void;
+    abstract insert(key: K, value?: V): void;
     /**
      * Deletes a node with a specific key from the tree.
      *
@@ -328,7 +270,7 @@ export declare class BinarySearchTree<K extends Comparable<K>, V = any, T extend
      * @returns {boolean}
      * @memberof BinarySearchTree
      */
-    delete(key: K): boolean;
+    abstract delete(key: K): boolean;
     /**
      * 将树上某个结点替换成另一个结点
      *

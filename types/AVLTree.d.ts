@@ -1,6 +1,13 @@
 import { Comparable } from './Comparable';
-import { Node, BinarySearchTree } from './BinarySearchTree';
-export declare class AVLNode<K extends Comparable<K>, V = any> extends Node<K, V> {
+import { BinarySearchTree } from './BinarySearchTree';
+import { Node } from './Node';
+export declare class AVLNode<K extends Comparable, V> implements Node<K, V> {
+    key: K;
+    value?: V;
+    parent: this;
+    left: this;
+    right: this;
+    constructor(key: K, value?: V);
     /**
      * 记录高度
      *
@@ -63,7 +70,7 @@ export declare class AVLNode<K extends Comparable<K>, V = any> extends Node<K, V
      */
     updateHeight(): void;
 }
-export declare class AVLTree<K extends Comparable<K>, V = any, T extends AVLNode<K, V> = AVLNode<K, V>> extends BinarySearchTree<K, V, T> {
+export declare class AVLTree<K extends Comparable, V, T extends AVLNode<K, V>> extends BinarySearchTree<K, V, T> {
     rotateRight(node: T): T;
     rotateLeft(node: T): T;
     insert(key: K, value?: V): void;
