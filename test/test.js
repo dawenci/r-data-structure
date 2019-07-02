@@ -46,12 +46,12 @@ console.timeEnd('AVL Tree insert')
 console.time('AVL Tree search')
 const searchResult = []
 randomSearchOrder.forEach((val) => {
-  searchResult.push(avl.getValue(val))
+  searchResult.push(avl.value(val))
 })
 console.timeEnd('AVL Tree search')
 console.time('AVL Tree traversal')
 let traversal = []
-avl.forEach((value, key, tree) => traversal.push(key))
+avl.inorder(key => traversal.push(key))
 console.timeEnd('AVL Tree traversal')
 console.time('AVL Tree delete')
 randomSearchOrder.forEach(val => {
@@ -74,12 +74,12 @@ console.timeEnd('RB Tree insert')
 console.time('RB Tree search')
 const searchResult2 = []
 randomSearchOrder2.forEach((val) => {
-  searchResult2.push(rbt.getValue(val))
+  searchResult2.push(rbt.value(val))
 })
 console.timeEnd('RB Tree search')
 console.time('RB Tree traversal')
 let traversal2 = []
-rbt.forEach((value, key, tree) => traversal2.push(key))
+rbt.inorder(key => traversal2.push(key))
 console.timeEnd('RB Tree traversal')
 console.time('RB Tree delete')
 randomSearchOrder2.forEach(val => {

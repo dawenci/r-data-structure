@@ -92,9 +92,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     const backtracking = this.nodeErase(targetNode)
 
     // 删掉的是根，则现在是空树，符合所有性质，无需修复直接返回
-    if (this.root === null) {
-      return true;
-    }
+    if (this.root === null) return true;
 
     // 被删结点
     const removed = backtracking.node

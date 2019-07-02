@@ -57,146 +57,88 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
      */
     clear(): void;
     /**
-     * 中序遍历迭代器
-     *
-     * @template K
-     * @template V
-     * @template T
-     * @param {(T | Nil)} root
-     * @returns {IterableIterator<T>}
-     * @memberof BinarySearchTree
-     */
-    inorder(root: T | Nil): IterableIterator<T>;
-    /**
-     * 后续遍历迭代器
-     *
-     * @template K
-     * @template V
-     * @template T
-     * @param {(T | Nil)} root
-     * @returns {IterableIterator<T>}
-     * @memberof BinarySearchTree
-     */
-    postorder(root: T | Nil): IterableIterator<T>;
-    /**
-     * 前序遍历迭代器
-     *
-     * @template K
-     * @template V
-     * @template T
-     * @param {(T | Nil)} root
-     * @returns {IterableIterator<T>}
-     * @memberof BinarySearchTree
-     */
-    preorder(root: T | Nil): IterableIterator<T>;
-    /**
      * 迭代器执行器
      *
-     * @param {IterableIterator<T>} iterator
+     * @param {IterableIterator<RbNode<K, V>>} iterator
      * @param {((value: V, key: K, tree: this) => false | void)} iteratee
      * @param {*} [thisArg]
      * @returns
      * @memberof BinarySearchTree
      */
-    baseFor(iterator: IterableIterator<T>, iteratee: (value: V, key: K, tree: this) => false | void, thisArg?: any): this;
+    _for(iterator: IterableIterator<T>, iteratee: (key: K, value: V) => false | void): this;
+    /**
+     * 中序迭代树结点
+     *
+     * @param {((key: K, value: V) => false | void)} iteratee
+     * @returns {void}
+     */
+    inorder(iteratee: (key: K, value: V) => false | void): this;
+    /**
+     * 前序迭代树结点
+     *
+     * @param {((key: K, value: V) => false | void)} iteratee
+     * @returns {void}
+     */
+    preorder(iteratee: (key: K, value: V) => false | void): this;
+    /**
+     * 后序迭代树结点
+     *
+     * @param {((key: K, value: V) => false | void)} iteratee
+     * @returns {void}
+     */
+    postorder(iteratee: (key: K, value: V) => false | void): this;
     /**
      * Implement "iterable protocol"
-     *
-     * @memberof BinarySearchTree
      */
-    [Symbol.iterator](): IterableIterator<(K | V)[]>;
+    [Symbol.iterator](): IterableIterator<any[]>;
     /**
      * Implement "iterator protocol"
-     *
-     * @memberof BinarySearchTree
      */
-    keys(): IterableIterator<K>;
+    keys(): IterableIterator<any>;
     /**
      * Implement "iterator protocol"
-     *
-     * @memberof BinarySearchTree
      */
-    values(): IterableIterator<V>;
+    values(): IterableIterator<any>;
     /**
      * 获取迭代器
      *
      * @returns
-     * @memberof BinarySearchTree
      */
-    entries(): IterableIterator<(K | V)[]>;
-    /**
-     * 迭代树结点
-     *
-     * @param {((value: V, key: K, tree: this) => false | void)} iteratee
-     * @param {*} [thisArg]
-     * @returns
-     * @memberof BinarySearchTree
-     */
-    forEach(iteratee: (value: V, key: K, tree: this) => false | void, thisArg?: any): this;
-    /**
-     * 迭代指定 key 开始的树结点
-     *
-     * @param {K} key
-     * @param {((value: V, key: K, tree: this) => false | void)} iteratee
-     * @param {*} [thisArg]
-     * @memberof BinarySearchTree
-     */
-    eachSuccessor(key: K, iteratee: (value: V, key: K, tree: this) => false | void, thisArg?: any): void;
-    /**
-     * 迭代指定 key 开始的树结点
-     *
-     * @param {K} key
-     * @param {((value: V, key: K, tree: this) => false | void)} iteratee
-     * @param {*} [thisArg]
-     * @memberof BinarySearchTree
-     */
-    eachPredecessor(key: K, iteratee: (value: V, key: K, tree: this) => false | void, thisArg?: any): void;
+    entries(): IterableIterator<any[]>;
     /**
      * 返回最小 key 对应的结点值
      *
      * @returns {V}
-     * @memberof BinarySearchTree
      */
-    minimum(): {
-        key: K;
-        value: V;
-    } | undefined;
+    minimum(callback: (key: K, value: V) => any): void;
     /**
      * 返回最大 key 对应的结点值
      *
      * @returns {V}
-     * @memberof BinarySearchTree
      */
-    maximum(): {
-        key: K;
-        value: V;
-    };
+    maximum(callback: (key: K, value: V) => any): void;
     /**
      * The minimum key in the tree.
      *
      * @returns {K}
-     * @memberof BinarySearchTree
      */
     minimumKey(): K;
     /**
      * The maximum key in the tree.
      *
      * @returns {K}
-     * @memberof BinarySearchTree
      */
     maximumKey(): K;
     /**
      * 返回最小 key 对应的结点值
      *
      * @returns {V}
-     * @memberof BinarySearchTree
      */
     minimumValue(): V;
     /**
      * 返回最大 key 对应的结点值
      *
      * @returns {V}
-     * @memberof BinarySearchTree
      */
     maximumValue(): V;
     /**
@@ -204,7 +146,6 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
      *
      * @param {K} key The value being searched for.
      * @returns {boolean} Whether a node with the value exists.
-     * @memberof BinarySearchTree
      */
     has(key: K): boolean;
     /**
@@ -212,20 +153,15 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
      *
      * @param {K} key The key being searched for.
      * @returns The node value or undefined if it doesn't exist.
-     * @memberof BinarySearchTree
      */
-    getValue(key: K): V;
+    value(key: K): V;
     /**
      * Gets the data of a node within the tree with a specific value.
      *
      * @param {K} [key]
-     * @returns {({ key: K, value: V } | null)}
-     * @memberof BinarySearchTree
+     * @param {(key: K, value: V) => any} callback
      */
-    search(key: K): {
-        key: K;
-        value: V;
-    } | null;
+    search(key: K, callback: (key: K, value: V) => any): void;
     /**
      * Inserts a new node with a specific key and value into the tree.
      *
@@ -318,17 +254,17 @@ export declare abstract class BinarySearchTree<K extends Comparable, V, T extend
      * @memberof BinarySearchTree
      */
     private _maximumNode;
-    private _setRoot;
+    _setRoot(node: T): void;
     /**
      * 增加结点数量
      *
      * @memberof BinarySearchTree
      */
-    private _increaseSize;
+    _increaseSize(): void;
     /**
      * 减少结点数量
      *
      * @memberof BinarySearchTree
      */
-    private _decreaseSize;
+    _decreaseSize(): void;
 }
