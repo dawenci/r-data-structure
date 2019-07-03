@@ -14,7 +14,7 @@ export declare class SkipList<K, V> {
     constructor(options?: any);
     insert(key: K, value: V): boolean;
     delete(key: K): boolean;
-    getValue(key: K): V;
+    value(key: K): V;
     forEach(callback: any, thisArg: any): void;
     _predecessors(key: K): {
         [key: number]: SkipNode<K, V>;

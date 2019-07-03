@@ -92,7 +92,7 @@ export class AvlNode<K, V> implements Node<K, V> {
    * @memberof Node
    */
   public updateHeight() {
-    const { leftHeight, rightHeight } = this;
+    const { leftHeight, rightHeight } = this
     const height = ((leftHeight > rightHeight ? leftHeight : rightHeight) + 1) | 0
     this.height = height
   }
@@ -111,18 +111,18 @@ export class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree<K, V, T
 
   // @override
   rotateRight(node: T): T {
-    const pivot = super.rotateRight(node);
-    node.updateHeight();
-    pivot.updateHeight();
-    return pivot;
+    const pivot = super.rotateRight(node)
+    node.updateHeight()
+    pivot.updateHeight()
+    return pivot
   }
 
   // @override
   rotateLeft(node: T): T {
-    const pivot = super.rotateLeft(node);
-    node.updateHeight();
-    pivot.updateHeight();
-    return pivot;
+    const pivot = super.rotateLeft(node)
+    node.updateHeight()
+    pivot.updateHeight()
+    return pivot
   }
 
   // @override
@@ -131,36 +131,52 @@ export class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree<K, V, T
     const insertPoint = this.nodeInsert(node)
     // 本次插入是重复结点，直接更新 key / value
     // 无新结点插入，所以无需进行插入后的调整
-    if (insertPoint == null) return;
+    if (insertPoint === null) return
 
     // 新增结点成功时，回溯调整搜索路径上的结点
-    this._adjustAfterInsertion(insertPoint);
+    this._adjustAfterInsertion(insertPoint)
   }
 
   // @override
   delete(key: K): boolean {
     // 搜索待删除结点
-    const targetNode = this.nodeSearch(key);
+    let targetNode = this.nodeSearch(key)
     // 未找到 value 对应结点
-    if (targetNode == null) return false;
+    if (targetNode === null) return false
 
-    // 执行删除结点操作
-    const backtracking = this.nodeErase(targetNode);
-    const parent = backtracking.parent;
+    // 同时拥有左右子树，先转换成只有一颗子树的情况再统一处理：
+    // 将待删节点的值跟前驱或者后继节点（此处使用前驱）交换 key 和 value，
+    // 然后问题就变成了如何删除前驱或者后继节点，从而简化成只有一个子节点的删除情况
+    if (targetNode.left !== null && targetNode.right !== null) {
+      // 找到前驱结点
+      const scapegoat = this.inorderPredecessor(targetNode)
+      // 交换
+      targetNode.key = scapegoat.key
+      targetNode.value = scapegoat.value
+      targetNode = scapegoat
+    }
+
+    // 需要真实删除的结点的父结点
+    const parent = targetNode.parent
+
+    // 待删结点少于两颗子树时，使用子树 (或 null，没子树时) 顶替移除的结点即可
+    const child = targetNode.left || targetNode.right
+    this.replaceNode(targetNode, child)
+    this.decreaseSize()
 
     // 回溯调整搜索路径上的结点
     if (parent !== null) {
-      this._adjustAfterRemoval(parent);
+      this._adjustAfterRemoval(parent)
     }
 
-    return true;
+    return true
   }
 
   // AVL 树插入结点后调整动作
   // 自底向上调整结点的高度
-  // 遇到离 current 最近的不平衡点需要做旋转调整 
+  // 遇到离 current 最近的不平衡点需要做旋转调整
   // 注意: 对最近的不平衡点调整后 或者 结点的高度值没有变化时
-  // 上层结点便不需要更新 
+  // 上层结点便不需要更新
   // 调整次数不大于1
   private _adjustAfterInsertion(backtracking: T): void {
     let current: T | Nil = backtracking

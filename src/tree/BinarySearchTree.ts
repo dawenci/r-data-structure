@@ -1,5 +1,6 @@
-import { Node, Nil } from './Node';
+import { Node, Nil } from './Node'
 import { inorder, preorder, postorder } from './iterator'
+import { setRoot, setLeft, setRight, rotateLeft, rotateRight, minimumNode, maximumNode, baseFor } from './helpers'
 
 export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   private _root: T | Nil = null
@@ -9,7 +10,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   compare: (a: K, b: K) => number
 
   constructor(compare?: (a: K, b: K) => number) {
-    this.compare = compare || ((a: any, b: any) => (a - b) | 0);
+    this.compare = compare || ((a: any, b: any) => (a - b) | 0)
   }
 
   /**
@@ -38,19 +39,34 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   /**
    * 移除数据
    *
+   * 算法逻辑：
+   * 
+   * 分有三种情况，
+   * 1：删除结点恰好为叶子结点
+   * 只需要将其父结点指向空，然后 delete 该结点即可
+   * 
+   * 2：删除结点恰好有一个分支
+   * 将其父亲结点指向其儿子结点即可，然后delete掉它
+   * 
+   * 3：删除结点恰好有两个分支
+   * 第一种方法：找到该结点的前驱，然后将它的数据与要删除的结点交换，最后删除这个前驱即可
+   * 第二种方法：找到该结点的后继，然后将它的数据与要删除的结点交换，最后删除这个后继即可
+   * 利用的是：前驱没有右子树，后继没有左子树的特性，其中前驱为小于该结点的最大结点，
+   * 前驱没有右子树，而后继为大于该结点的最小结点，后继没有左子树
+   *
    * @param {K} key
    * @returns {boolean}
    * @memberof BinarySearchTree
    */
-  abstract delete(key: K): boolean  
+  abstract delete(key: K): boolean
 
   /**
    * 清空数据
    */
   clear(): void {
     this._size = 0
-    this._setRoot(null)
-  }  
+    setRoot(this, null)
+  }
 
   /**
    * 获取中序遍历顺序时，node 的后继结点
@@ -66,22 +82,22 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * @returns {(T | Nil)}
    */
   inorderSuccessor(node: T): T | Nil {
-    if (node === null) return null;
+    if (node === null) return null
     // 1. 有右子树，找到右子树最小元素
     if (node.right !== null) {
-      return this._minimumNode(node.right);
+      return minimumNode(node.right)
     }
     // 2. 没有右子树，往上搜索
-    let parent = node.parent;
+    let parent = node.parent
     while (parent != null) {
       if (node === parent.left) {
-        return parent;
+        return parent
       }
-      node = parent;
-      parent = node.parent;
+      node = parent
+      parent = node.parent
     }
     // 3. 搜索到根
-    return null;
+    return null
   }
 
   /**
@@ -98,25 +114,25 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * @returns {(T | Nil)}
    */
   inorderPredecessor(node: T): T | Nil {
-    if (node == null) return null;
+    if (node == null) return null
 
     // 1. 有左子树，找到左子树最大元素
     if (node.left !== null) {
-      return this._maximumNode(node.left);
+      return maximumNode(node.left)
     }
 
     // 2. 没有左子树，往上搜索
-    let parent = node.parent;
+    let parent = node.parent
     while (parent != null) {
       if (node == parent.right) {
-        return parent;
+        return parent
       }
-      node = parent;
-      parent = node.parent;
+      node = parent
+      parent = node.parent
     }
 
     // 4. 搜索到根
-    return null;
+    return null
   }
 
   /**
@@ -126,7 +142,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * @returns {void}
    */
   inorder(iteratee: (key: K, value: V) => any) {
-    return this._for(inorder(this._root), iteratee)
+    return baseFor(this, inorder(this._root), iteratee)
   }
 
   /**
@@ -136,7 +152,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * @returns {void}
    */
   preorder(iteratee: (key: K, value: V) => any) {
-    return this._for(preorder(this._root), iteratee)
+    return baseFor(this, preorder(this._root), iteratee)
   }
 
   /**
@@ -146,9 +162,9 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * @returns {void}
    */
   postorder(iteratee: (key: K, value: V) => any) {
-    return this._for(postorder(this._root), iteratee)
+    return baseFor(this, postorder(this._root), iteratee)
   }
-  
+
   /**
    * Implement "iterator protocol"
    */
@@ -170,8 +186,8 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   *[Symbol.iterator]() {
     const iterator = inorder(this._root)
-    for (let node of iterator) yield [node.key, node.value]
-  }  
+    for (let node of iterator) yield [ node.key, node.value ]
+  }
 
   /**
    * 获取迭代器
@@ -213,7 +229,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   search(key: K, callback: (key: K, value: V) => any): void {
     if (this._root === null) {
-      callback(null, null);
+      callback(null, null)
       return
     }
     const node = this.nodeSearch(key)
@@ -225,9 +241,9 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    *
    * @returns {V}
    */
-  minimum(): { key: K, value: V } | null {
-    if (this._root === null) return null;
-    const node = this._minimumNode(this._root)
+  minimum(): { key: K; value: V } | null {
+    if (this._root === null) return null
+    const node = minimumNode(this._root)
     return { key: node.key, value: node.value }
   }
 
@@ -236,9 +252,9 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    *
    * @returns {V}
    */
-  maximum(): { key: K, value: V } | null {
+  maximum(): { key: K; value: V } | null {
     if (this._root === null) return null
-    const node = this._minimumNode(this._root)
+    const node = minimumNode(this._root)
     return { key: node.key, value: node.value }
   }
 
@@ -249,7 +265,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   minimumKey(): K {
     if (this._root === null) return
-    return this._minimumNode(this._root).key
+    return minimumNode(this._root).key
   }
 
   /**
@@ -259,7 +275,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   maximumKey(): K {
     if (this._root === null) return
-    return this._maximumNode(this._root).key
+    return maximumNode(this._root).key
   }
 
   /**
@@ -269,7 +285,7 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   minimumValue(): V {
     if (this._root === null) return
-    return this._minimumNode(this._root).value
+    return minimumNode(this._root).value
   }
 
   /**
@@ -279,49 +295,24 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   maximumValue(): V {
     if (this._root === null) return
-    return this._maximumNode(this._root).value
+    return maximumNode(this._root).value
   }
 
   /**
-   * 设置左子结点，同时维护 parent 关系
-   */ 
-  protected setLeft(node: T, child: T): void {
-    // 断开旧 left 结点
-    if (node.left !== null) {
-      node.left.parent = null;
-    }
-    // 连接新结点
-    if (child !== null) {
-      // 从旧 parent 中断开
-      if (child.parent !== null) {
-        child.parent.left === child 
-          ? (child.parent.left = null)
-          : (child.parent.right = null);
-      }
-      child.parent = node;
-    }
-    node.left = child;
-  }
-
-  /**
-   * 设置右子结点，同时维护 parent 关系
+   * 增加结点数量
+   *
+   * @memberof BinarySearchTree
    */
-  protected setRight(node: T, child: T): void {
-    // 断开旧 right 结点
-    if (node.right !== null) {
-      node.right.parent = null;
-    }
-    // 连接新结点
-    if (child !== null) {
-      // 从旧 parent 中断开
-      if (child.parent !== null) {
-        child.parent.left === child 
-          ? (child.parent.left = null)
-          : (child.parent.right = null);
-      }
-      child.parent = node;
-    }
-    node.right = child;
+  protected increaseSize(): void {
+    this._size += 1
+  }
+  /**
+   * 减少结点数量
+   *
+   * @memberof BinarySearchTree
+   */
+  protected decreaseSize(): void {
+    this._size -= 1
   }
 
   /**
@@ -338,88 +329,32 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
 
     // node 为 root 的情况
     if (node === this._root) {
-      this._setRoot(replacer)
+      setRoot(this, replacer)
     }
     else {
       // 非 root，有父结点的情况
       const parent = node.parent
-      if (parent.left === node) this.setLeft(parent, replacer)
-      else this.setRight(parent, replacer)
+      if (parent.left === node) setLeft(parent, replacer)
+      else setRight(parent, replacer)
     }
 
     return node
   }
 
-  /// 左旋，返回新顶点，注意旋转完毕会从原本的树上脱落
-  /// Performs a left rotate on this node.
-  /// 
-  ///     p                              g
-  ///    / \                            / \
-  ///   c   g   -> p.rotateLeft() ->   p   u
-  ///      / \                        / \
-  ///     s   u                      c   s
-  ///
-  /// @returns {this} The root of the sub-tree; the node where this node used to be.
+  // 左旋，返回新顶点
   protected rotateLeft(node: T): T {
-    const parent = node.parent;
-    // 记录原本在树上的位置
-    const isLeft = parent !== null && parent.left == node;
-
-    // 旋转
-    const pivot = node.right;
-    const pivotLeft = pivot.left;
-    this.setRight(node, pivotLeft);
-    this.setLeft(pivot, node);
-    // 旋转完毕
-
-    // 新顶点接上树上原本的位置
-    if (parent !== null) {
-      if (isLeft) this.setLeft(parent, pivot);
-      else this.setRight(parent, pivot);
-    }
-
-    // ---
-    if (node === this._root) {
-      this._setRoot(pivot);
-    }
-    return pivot;
+    const pivot = rotateLeft(node)
+    if (node === this._root) setRoot(this, pivot)
+    return pivot
   }
 
-  /// 右旋，返回新顶点，注意旋转完毕会从原本的树上脱落
-  /// Performs a right rotate on this node.
-  /// 
-  ///       g                           p
-  ///      / \                         / \
-  ///     p   u -> g.rotateRight() -> c   g
-  ///    / \                             / \
-  ///   c   s                           s   u
-  ///
-  /// @returns {this} The root of the sub-tree; the node where this node used to be.
+  // 右旋，返回新顶点
   protected rotateRight(node: T): T {
-    const parent = node.parent;
-    // 记录原本在树上的位置
-    const isLeft = parent !== null && parent.left === node;    
-
-    // 旋转
-    const pivot = node.left;
-    const pivotRight = pivot.right;
-    this.setLeft(node, pivotRight);
-    this.setRight(pivot, node);
-    // 旋转完毕
-
-    // 新顶点接上树上原本的位置
-    if (parent !== null) {
-      if (isLeft) this.setLeft(parent, pivot);
-      else this.setRight(parent, pivot);
-    }
-
-    // ---
-    if (node === this._root) {
-      this._setRoot(pivot);
-    }
-    return pivot;
+    const pivot = rotateRight(node)
+    if (node === this._root) setRoot(this, pivot)
+    return pivot
   }
-  
+
   /**
    * 搜索 Node
    *
@@ -453,8 +388,8 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   protected nodeInsert(node: T): T {
     // 空树
     if (this._root === null) {
-      this._setRoot(node)
-      this._increaseSize()
+      setRoot(this, node)
+      this.increaseSize()
       return null
     }
 
@@ -467,166 +402,26 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
       const result = compare(key, current.key)
       if (result > 0) {
         if (current.right === null) {
-          this.setRight(current, node)
-          this._increaseSize();
-          return current;
+          setRight(current, node)
+          this.increaseSize()
+          return current
         }
         current = current.right
       }
       else if (result < 0) {
         if (current.left === null) {
-          this.setLeft(current, node)
-          this._increaseSize();
-          return current;
+          setLeft(current, node)
+          this.increaseSize()
+          return current
         }
         current = current.left
       }
       else {
         // No duplicates, just update key & value
-        current.key = key;
-        current.value = node.value;
-        return null;
+        current.key = key
+        current.value = node.value
+        return null
       }
     }
-  }
-
-  /**
-   * 从树上移除一个结点
-   * 返回 [ 被删除元素的父结点, 被删除结点位置补位的结点（被删结点的子结点或 Nil）, 被删结点 ] 元组
-   * 
-   * 删除操作，有三种情况：
-   * 1：删除结点恰好为叶子结点
-   * 只需要将其父结点指向空，然后 delete 该结点即可
-   * 
-   * 2：删除结点恰好有一个分支
-   * 将其父亲结点指向其儿子结点即可，然后delete掉它
-   * 
-   * 3：删除结点恰好有两个分支
-   * 第一种方法：找到该结点的前驱，然后将它的值赋值给要删除的结点，最后删除这个前驱即可
-   * 第二种方法：找到该结点的后继，然后将它的值赋值给要删除的结点，最后删除这个后继即可
-   * 利用的是：前驱没有右子树，后继没有左子树的特性
-   * 前驱：小于该结点的最大结点，前驱没有右子树 
-   * 后继：大于该结点的最小结点，后继没有左子树 
-   *
-   * @protected
-   * @param {T} node
-   * @returns {([T | Nil, T | Nil, T])}
-   * @memberof BinarySearchTree
-   */
-  protected nodeErase(node: T): {
-    parent: T | Nil,
-    child: T | Nil,
-    node: T
-  } {
-    // 同时拥有左右子树
-    // 先转换成只有一颗子树的情况再统一处理
-    if (node.left !== null && node.right !== null) {
-      // OR const replacer = this.inorderSuccessor(node)
-      const replacer = this.inorderPredecessor(node)
-
-      // 使用前驱结点替换身份
-      // 此时问题转换成删掉替代结点（前驱），
-      // 从而简化成只有一个子结点的删除情况
-      node.key = replacer.key
-      node.value = replacer.value
-
-      // 修改 node 指针
-      node = replacer
-    }
-
-    // 删除点的父结点
-    const parent = node.parent
-
-    // 待删结点少于两颗子树时，使用子树 (或 null，没子树时) 顶替移除的结点即可
-    const child = node.left || node.right
-    this.replaceNode(node, child)
-    this._decreaseSize()
-
-    return {
-      parent,
-      child,
-      node
-    }
-  }
-
-  /**
-   * 迭代
-   *
-   * @param {IterableIterator<T>} iterator
-   * @param {(key: K, value: V) => any} iteratee
-   * @returns {void}
-   */
-  private _for(iterator: IterableIterator<T>, iteratee: (key: K, value: V) => any): void {
-    const tree = this
-    if (typeof iteratee !== 'function') return
-    if (tree.root === null) return
-    for (let node of iterator) {
-      if (iteratee(node.key, node.value) === false) {
-        break
-      }
-    }
-  }  
-
-  /**
-   * Gets the minimum value node, rooted in a particular node.
-   *
-   * @param {T} subRoot The node to search.
-   * @returns {T} The node with the minimum value in the tree.
-   * @memberof BinarySearchTree
-   */
-  private _minimumNode(subRoot: T): T {
-    let current = subRoot
-    while (current.left !== null) {
-      current = current.left
-    }
-    return current
-  }
-
-  /**
-   * Gets the maximum value node, rooted in a particular node.
-   *
-   * @param {T} subRoot The node to search.
-   * @returns {T} The node with the maximum value in the tree.
-   * @memberof BinarySearchTree
-   */
-  private _maximumNode(subRoot: T): T {
-    let current = subRoot
-    while (current.right !== null) {
-      current = current.right
-    }
-    return current
-  }  
-
-  /// 设置根结点
-  private _setRoot(node: T): void {
-    if (node === null) {
-      this._root = null;
-      return;
-    }
-    this._root = node;
-    // 如果本身在树中，则从树中脱落，成为独立的树根
-    if (node.parent !== null) {
-      node.parent.left === node 
-        ? (node.parent.left = null)
-        : (node.parent.right = null);
-      node.parent = null;
-    }
-  }
-
-  /**
-   * 增加结点数量
-   *
-   * @memberof BinarySearchTree
-   */
-  private _increaseSize(): void {
-    this._size += 1
-  }
-  /**
-   * 减少结点数量
-   *
-   * @memberof BinarySearchTree
-   */
-  private _decreaseSize(): void {
-    this._size -= 1
   }
 }

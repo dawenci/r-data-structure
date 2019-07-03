@@ -34,9 +34,9 @@ export class SkipList<K, V> {
     this._maxLevel = maxLevel
     this._head = new SkipNode<K, V>(null, 'HEAD', maxLevel)
 
-    this.compare = options.compare || ((a: any, b: any) => (a - b) | 0);
+    this.compare = options.compare || ((a: any, b: any) => (a - b) | 0)
 
-    this.size = 0    
+    this.size = 0
   }
 
   insert(key: K, value: V) {
@@ -48,8 +48,8 @@ export class SkipList<K, V> {
 
     // 如果结点存在，则只刷新值
     if (next && this.compare(next.key, key) === 0) {
-      next.value = value;
-      return;
+      next.value = value
+      return
     }
 
     // 随机生成新结点的层数
@@ -78,7 +78,7 @@ export class SkipList<K, V> {
     // 前驱的下个结点即为将删除的结点
     let removing = pred[0]
 
-    // 结点不存在    
+    // 结点不存在
     if (!removing || this.compare(removing.key, key) !== 0) {
       return false
     }
@@ -90,7 +90,7 @@ export class SkipList<K, V> {
       if (predecessor[currenLevel] !== removing) {
         // debugger
         break
-      }      
+      }
       predecessor[currenLevel] = removing[currenLevel]
     }
 
@@ -99,7 +99,7 @@ export class SkipList<K, V> {
     return true
   }
 
-  getValue(key: K) {
+  value(key: K) {
     const compare = this.compare
     let currentLevel = this._maxLevel
     let pred = this._head
@@ -163,5 +163,5 @@ export class SkipList<K, V> {
       level += 1
     }
     return level
-  }  
+  }
 }

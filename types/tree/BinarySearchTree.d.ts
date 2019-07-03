@@ -24,6 +24,21 @@ export declare abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
     /**
      * 移除数据
      *
+     * 算法逻辑：
+     *
+     * 分有三种情况，
+     * 1：删除结点恰好为叶子结点
+     * 只需要将其父结点指向空，然后 delete 该结点即可
+     *
+     * 2：删除结点恰好有一个分支
+     * 将其父亲结点指向其儿子结点即可，然后delete掉它
+     *
+     * 3：删除结点恰好有两个分支
+     * 第一种方法：找到该结点的前驱，然后将它的数据与要删除的结点交换，最后删除这个前驱即可
+     * 第二种方法：找到该结点的后继，然后将它的数据与要删除的结点交换，最后删除这个后继即可
+     * 利用的是：前驱没有右子树，后继没有左子树的特性，其中前驱为小于该结点的最大结点，
+     * 前驱没有右子树，而后继为大于该结点的最小结点，后继没有左子树
+     *
      * @param {K} key
      * @returns {boolean}
      * @memberof BinarySearchTree
@@ -164,13 +179,17 @@ export declare abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
      */
     maximumValue(): V;
     /**
-     * 设置左子结点，同时维护 parent 关系
+     * 增加结点数量
+     *
+     * @memberof BinarySearchTree
      */
-    protected setLeft(node: T, child: T): void;
+    protected increaseSize(): void;
     /**
-     * 设置右子结点，同时维护 parent 关系
+     * 减少结点数量
+     *
+     * @memberof BinarySearchTree
      */
-    protected setRight(node: T, child: T): void;
+    protected decreaseSize(): void;
     /**
      * 将树上某个结点替换成另一个结点
      *
@@ -203,69 +222,4 @@ export declare abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
      * @memberof BinarySearchTree
      */
     protected nodeInsert(node: T): T;
-    /**
-     * 从树上移除一个结点
-     * 返回 [ 被删除元素的父结点, 被删除结点位置补位的结点（被删结点的子结点或 Nil）, 被删结点 ] 元组
-     *
-     * 删除操作，有三种情况：
-     * 1：删除结点恰好为叶子结点
-     * 只需要将其父结点指向空，然后 delete 该结点即可
-     *
-     * 2：删除结点恰好有一个分支
-     * 将其父亲结点指向其儿子结点即可，然后delete掉它
-     *
-     * 3：删除结点恰好有两个分支
-     * 第一种方法：找到该结点的前驱，然后将它的值赋值给要删除的结点，最后删除这个前驱即可
-     * 第二种方法：找到该结点的后继，然后将它的值赋值给要删除的结点，最后删除这个后继即可
-     * 利用的是：前驱没有右子树，后继没有左子树的特性
-     * 前驱：小于该结点的最大结点，前驱没有右子树
-     * 后继：大于该结点的最小结点，后继没有左子树
-     *
-     * @protected
-     * @param {T} node
-     * @returns {([T | Nil, T | Nil, T])}
-     * @memberof BinarySearchTree
-     */
-    protected nodeErase(node: T): {
-        parent: T | Nil;
-        child: T | Nil;
-        node: T;
-    };
-    /**
-     * 迭代
-     *
-     * @param {IterableIterator<T>} iterator
-     * @param {(key: K, value: V) => any} iteratee
-     * @returns {void}
-     */
-    private _for;
-    /**
-     * Gets the minimum value node, rooted in a particular node.
-     *
-     * @param {T} subRoot The node to search.
-     * @returns {T} The node with the minimum value in the tree.
-     * @memberof BinarySearchTree
-     */
-    private _minimumNode;
-    /**
-     * Gets the maximum value node, rooted in a particular node.
-     *
-     * @param {T} subRoot The node to search.
-     * @returns {T} The node with the maximum value in the tree.
-     * @memberof BinarySearchTree
-     */
-    private _maximumNode;
-    private _setRoot;
-    /**
-     * 增加结点数量
-     *
-     * @memberof BinarySearchTree
-     */
-    private _increaseSize;
-    /**
-     * 减少结点数量
-     *
-     * @memberof BinarySearchTree
-     */
-    private _decreaseSize;
 }
