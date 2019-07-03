@@ -110,3 +110,63 @@ export function *preorder(root: Node | null): IterableIterator<Node | null> {
     }
   }
 }
+
+
+/**
+* 遍历 from 、to 两个 key 之间的所有结点
+*/
+export function *inorderRange(
+  root: Node | null,
+  compare: (a, b) => number,
+  fromKey,
+  toKey) {
+
+ // 找到符合条件的 root 节点
+ while (root !== null) {
+   const result1 = compare(fromKey, root.key)
+   const result2 = compare(toKey, root.key)
+   // 当前节点比 start 小，不再搜索左子树
+   if (result1 > 0) {
+     root = root.right
+     continue
+   }
+   // 当前节点大于 end，不再搜索右子树
+   if (result2 < 0) {
+     root = root.left
+     continue
+   }
+   break
+ }
+ // 没有符合条件的 root 结点，返回
+ if (!root) return
+
+ const stack = []
+ let current = root
+ while (stack.length || current) {
+   while (current) {
+     stack.push(current)
+     // 当前节点比 start 小，不再搜索 current 的左子树
+     if (compare(fromKey, current.key) > 0) break
+     current = current.left
+   }
+   if (stack.length) {
+     // 指向栈顶
+     current = stack[stack.length - 1]
+     const isGteStart = compare(fromKey, current.key) <= 0
+     const isLteEnd = compare(toKey, current.key) >= 0
+     if (isGteStart && isLteEnd) {
+       yield current
+     }
+
+     stack.pop()
+
+     // 只有 current 比 end 小，才继续搜索 current 的右子树
+     if (isLteEnd) {
+       current = current.right
+     }
+     else {
+       current = null
+     }
+   }
+ }
+}

@@ -84,6 +84,10 @@ export declare abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
      */
     inorder(iteratee: (key: K, value: V) => any): void;
     /**
+     * 中序遍历的别名方法
+     */
+    forEach(iteratee: (key: K, value: V) => any): void;
+    /**
      * 前序迭代树结点
      *
      * @param {(key: K, value: V) => any} iteratee
@@ -97,6 +101,10 @@ export declare abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
      * @returns {void}
      */
     postorder(iteratee: (key: K, value: V) => any): void;
+    /**
+     * 遍历 from 、to 两个 key 之间的所有结点
+     */
+    inorderRange(iteratee: (key: K, value: V) => any, fromKey: K, toKey: K): void;
     /**
      * Implement "iterator protocol"
      */

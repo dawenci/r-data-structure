@@ -38,4 +38,8 @@ export declare function postorder(root: Node | null): IterableIterator<Node | nu
  * @memberof BinarySearchTree
  */
 export declare function preorder(root: Node | null): IterableIterator<Node | null>;
+/**
+* 遍历 from 、to 两个 key 之间的所有结点
+*/
+export declare function inorderRange(root: Node | null, compare: (a: any, b: any) => number, fromKey: any, toKey: any): IterableIterator<Node>;
 export {};

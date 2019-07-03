@@ -1,6 +1,21 @@
 import { Node, Nil } from './Node'
-import { inorder, preorder, postorder } from './iterator'
-import { setRoot, setLeft, setRight, rotateLeft, rotateRight, minimumNode, maximumNode, baseFor } from './helpers'
+import {
+  inorder,
+  preorder,
+  postorder,
+  inorderRange
+} from './iterator'
+
+import {
+  setRoot,
+  setLeft,
+  setRight,
+  rotateLeft,
+  rotateRight,
+  minimumNode,
+  maximumNode,
+  baseFor
+} from './helpers'
 
 export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   private _root: T | Nil = null
@@ -146,6 +161,13 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   }
 
   /**
+   * 中序遍历的别名方法
+   */
+  forEach(iteratee: (key: K, value: V) => any) {
+    return baseFor(this, inorder(this._root), iteratee)
+  }  
+
+  /**
    * 前序迭代树结点
    *
    * @param {(key: K, value: V) => any} iteratee
@@ -163,6 +185,13 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    */
   postorder(iteratee: (key: K, value: V) => any) {
     return baseFor(this, postorder(this._root), iteratee)
+  }
+
+  /**
+   * 遍历 from 、to 两个 key 之间的所有结点
+   */
+  inorderRange(iteratee: (key: K, value: V) => any, fromKey: K, toKey: K): void {
+    return baseFor(this, inorderRange(this._root, this.compare, fromKey, toKey), iteratee)    
   }
 
   /**
