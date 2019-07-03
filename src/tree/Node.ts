@@ -1,5 +1,3 @@
-import { Comparable } from './Comparable'
-
 export type Nil = null
 
 export interface Node<K, V> {

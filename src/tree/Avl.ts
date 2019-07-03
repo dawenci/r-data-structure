@@ -138,11 +138,11 @@ export class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree<K, V, T
   }
 
   // @override
-  delete(key: K): boolean {
+  delete(key: K): void {
     // 搜索待删除结点
     let targetNode = this.nodeSearch(key)
     // 未找到 value 对应结点
-    if (targetNode === null) return false
+    if (targetNode === null) return
 
     // 同时拥有左右子树，先转换成只有一颗子树的情况再统一处理：
     // 将待删节点的值跟前驱或者后继节点（此处使用前驱）交换 key 和 value，
@@ -168,8 +168,6 @@ export class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree<K, V, T
     if (parent !== null) {
       this._adjustAfterRemoval(parent)
     }
-
-    return true
   }
 
   // AVL 树插入结点后调整动作

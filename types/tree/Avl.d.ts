@@ -74,7 +74,7 @@ export declare class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree
     rotateRight(node: T): T;
     rotateLeft(node: T): T;
     insert(key: K, value?: V): void;
-    delete(key: K): boolean;
+    delete(key: K): void;
     private _adjustAfterInsertion;
     private _adjustAfterRemoval;
     private _adjustLeftLeft;

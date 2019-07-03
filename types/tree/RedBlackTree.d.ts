@@ -16,7 +16,7 @@ export declare class RedBlackNode<K, V> implements Node<K, V> {
 export declare class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySearchTree<K, V, T> {
     constructor(compare?: (a: K, b: K) => number);
     insert(key: K, value?: V): void;
-    delete(key: K): boolean;
+    delete(key: K): void;
     /**
      * 插入后的调整
      *

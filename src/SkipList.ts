@@ -39,14 +39,18 @@ export class SkipList<K, V> {
     this.size = 0
   }
 
-  insert(key: K, value: V) {
+  /**
+   * 数据插入
+   */
+  insert(key: K, value: V): void {
     const predecessors = this._predecessors(key)
 
-    // undefined 则为 head
+    // 无前驱结点，则以 head 为前驱
     const pred = predecessors[0] || this._head
-    const next = pred[0]
 
-    // 如果结点存在，则只刷新值
+    // 如果前驱的下一个底层结点跟当前 key 一致，
+    // 则说明结点已经存在，只刷新值即可（不允许相同 key）
+    const next = pred[0]
     if (next && this.compare(next.key, key) === 0) {
       next.value = value
       return
@@ -55,9 +59,10 @@ export class SkipList<K, V> {
     // 随机生成新结点的层数
     let nodeLevel = this._randomLevel()
 
-    //创建新结点
+    // 创建新结点
     const newNode = new SkipNode<K, V>(key, value, nodeLevel)
-    // connect pointers of predecessors and new node to respective successors
+    
+    // 设置各层的指针
     let currentLevel = 0
     for (; currentLevel <= nodeLevel; currentLevel += 1) {
       const predecessor = predecessors[currentLevel] || this._head
@@ -66,40 +71,43 @@ export class SkipList<K, V> {
     }
 
     this.size += 1
-
-    return true
   }
 
-  delete(key: K) {
+  /**
+   * 数据删除
+   */
+  delete(key: K): void {
     const predecessors = this._predecessors(key)
 
-    // undefined 则为 head
+    // 无前驱结点，则以 head 为前驱
     const pred = predecessors[0] || this._head
-    // 前驱的下个结点即为将删除的结点
-    let removing = pred[0]
 
-    // 结点不存在
-    if (!removing || this.compare(removing.key, key) !== 0) {
-      return false
+    // 前驱的下个底层结点即为将删除的结点
+    let targetNode = pred[0]
+
+    // 结点不存在，则直接返回
+    if (!targetNode || this.compare(targetNode.key, key) !== 0) {
+      return
     }
 
-    // update pointers and delete node
+    // 更新各层的指针
     let currenLevel = 0
-    for (; currenLevel <= removing.nodeLevel; currenLevel += 1) {
+    for (; currenLevel <= targetNode.nodeLevel; currenLevel += 1) {
       const predecessor = predecessors[currenLevel] || this._head
-      if (predecessor[currenLevel] !== removing) {
+      if (predecessor[currenLevel] !== targetNode) {
         // debugger
         break
       }
-      predecessor[currenLevel] = removing[currenLevel]
+      predecessor[currenLevel] = targetNode[currenLevel]
     }
 
     this.size -= 1
-
-    return true
   }
 
-  value(key: K) {
+  /**
+   * 获取 key 对应的值
+   */
+  value(key: K): V {
     const compare = this.compare
     let currentLevel = this._maxLevel
     let pred = this._head
@@ -116,17 +124,21 @@ export class SkipList<K, V> {
     return node && node.value
   }
 
-  forEach(callback, thisArg) {
-    if (!callback) return
+  /**
+   * 遍历列表
+   * @param {(key: K, value: V) => any} iteratee
+   */
+  forEach(iteratee): void {
+    if (!iteratee) return
     let node = this._head[0]
     while (node) {
-      if (callback.call(thisArg, node.value, node.key, this) === false) return
+      if (iteratee(node.key, node.value) === false) return
       node = node[0]
     }
   }
 
   // 获取 key 在各层上的前驱结点
-  _predecessors(key: K) {
+  _predecessors(key: K): { [key: number]: SkipNode<K, V> } {
     const compare = this.compare
     const predecessors: { [key: number]: SkipNode<K, V> } = {}
 

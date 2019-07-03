@@ -66,11 +66,11 @@ export class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySear
   }
 
   // @override
-  delete(key: K): boolean {
+  delete(key: K): void {
     // 搜索待删除结点
     let targetNode = this.nodeSearch(key)
     // 未找到 value 对应结点
-    if (targetNode === null) return false
+    if (targetNode === null) return
 
     // 同时拥有左右子树，先转换成只有一颗子树的情况再统一处理：
     // 将待删节点的值跟前驱或者后继节点（此处使用前驱）交换 key 和 value，
@@ -93,13 +93,13 @@ export class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySear
     this.decreaseSize()
 
     // 删掉的是根，则现在是空树，符合所有性质，无需修复直接返回
-    if (this.root === null) return true
+    if (this.root === null) return
 
     // 删掉的结点为红色，无需调整
     // 注：被删结点为红色时，该红色结点的两个黑色孩子必定是 Nil 节点
     // 否则被删前不符合性质 5)
     if (targetNode.color === Color.Red) {
-      return true
+      return
     }
 
     // 删掉的为黑色结点，上顶补位的子结点为红色时，
@@ -107,7 +107,7 @@ export class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySear
     // 注：被删的黑色结点要么只有一个红色子结点，要么有两个 Nil 子结点
     if (replacer !== null && replacer.color === Color.Red) {
       replacer.color = Color.Black
-      return true
+      return
     }
 
     // 最后一种情况，被删黑色结点有两个 Nil 子结点，
@@ -124,7 +124,7 @@ export class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySear
 
     this._removeFixUp(nil)
 
-    return true
+    return
   }
 
   /**

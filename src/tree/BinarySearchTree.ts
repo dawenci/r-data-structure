@@ -55,10 +55,10 @@ export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
    * 前驱没有右子树，而后继为大于该结点的最小结点，后继没有左子树
    *
    * @param {K} key
-   * @returns {boolean}
+   * @returns {void}
    * @memberof BinarySearchTree
    */
-  abstract delete(key: K): boolean
+  abstract delete(key: K): void
 
   /**
    * 清空数据

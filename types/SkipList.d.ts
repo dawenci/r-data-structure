@@ -12,10 +12,23 @@ export declare class SkipList<K, V> {
     size: number;
     compare: (a: K, b: K) => number;
     constructor(options?: any);
-    insert(key: K, value: V): boolean;
-    delete(key: K): boolean;
+    /**
+     * 数据插入
+     */
+    insert(key: K, value: V): void;
+    /**
+     * 数据删除
+     */
+    delete(key: K): void;
+    /**
+     * 获取 key 对应的值
+     */
     value(key: K): V;
-    forEach(callback: any, thisArg: any): void;
+    /**
+     * 遍历列表
+     * @param {(key: K, value: V) => any} iteratee
+     */
+    forEach(iteratee: any): void;
     _predecessors(key: K): {
         [key: number]: SkipNode<K, V>;
     };
