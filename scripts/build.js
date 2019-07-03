@@ -9,7 +9,6 @@ const nodeResolvePlugin = require('rollup-plugin-node-resolve')
 const commonJSPlugin = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
 const tsCompile = require('./typescript-compile')
-  // const babel = require('rollup-plugin-babel')
 const uglify = require('uglify-js')
 const replace = require('rollup-plugin-replace')
 const pkg = require('../package.json')
@@ -74,6 +73,7 @@ function walkSync(dir) {
   }).map(item => item.path)
   return files
 }
+
 // generate declarations
 function generateDeclarations() {
   fse.ensureDirSync('types/_temp')
@@ -92,6 +92,7 @@ function generateDeclarations() {
   fse.removeSync('types/_temp')
   console.log(blue('types') + ' generated.')
 }
+
 // 编译 esm 版本
 function buildESM() {
   fse.ensureDirSync('dist/esm')
@@ -101,7 +102,6 @@ function buildESM() {
     moduleResolution: typescript.ModuleResolutionKind.ES2015,
     module: typescript.ModuleKind.ES2015,
     outDir: 'dist/esm',
-    // rootDir: './', // 加上该行，输出会是 dist/esm/src/index.js 这样的
   }))
   if (Array.isArray(emittedFiles)) {
     emittedFiles.forEach(file => {
@@ -110,6 +110,7 @@ function buildESM() {
   }
   console.log(blue('esm...') + ' done.')
 }
+
 // 编译 commonJS 版本
 function buildCJS() {
   fse.ensureDirSync('dist/cjs')
@@ -127,10 +128,10 @@ function buildCJS() {
   }
   console.log(blue('cjs...') + ' done.')
 }
+
 // browser 开发版 (bundle)
 function buildUMDDev() {
   fse.ensureDirSync('dist')
-    // Standalone Dev Build (Browser)
   return rollup
     .rollup({
       input: 'src/index.ts',
@@ -150,17 +151,17 @@ function buildUMDDev() {
       return bundle.generate({
         format: 'iife',
         banner: banner,
-        name: 'DTree'
+        name: 'R'
       })
     })
     .then(({ code }) => {
       return write(pkg.browser, code)
     })
 }
+
 // browser 产品版 (bundle)
 function buildUMDProd() {
   fse.ensureDirSync('dist')
-    // Standalone Production Build (Browser)
   return rollup
     .rollup({
       input: 'src/index.ts',
@@ -179,18 +180,18 @@ function buildUMDProd() {
     .then(function(bundle) {
       return bundle.generate({
         format: 'iife',
-        name: 'DTree',
+        name: 'R',
         banner: banner
       })
     })
     .then(({ code }) => {
       var result = uglify.minify(code, {})
       var minified = result.code
-        // var map = result.map
       minified = banner + '\n' + minified
       return write(pkg.browser.replace('.js', '.min.js'), minified, true)
     })
 }
+
 // 清理编译中间产物
 function clean() {
   // rollup-plugin-typescript2 缓存

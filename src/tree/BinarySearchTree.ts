@@ -1,69 +1,56 @@
-import { Comparable } from './Comparable';
 import { Node, Nil } from './Node';
 import { inorder, preorder, postorder } from './iterator'
 
-export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K, V>> {
+export abstract class BinarySearchTree<K, V, T extends Node<K, V>> {
   private _root: T | Nil = null
 
   private _size: number = 0
 
+  compare: (a: K, b: K) => number
+
+  constructor(compare?: (a: K, b: K) => number) {
+    this.compare = compare || ((a: any, b: any) => (a - b) | 0);
+  }
+
   /**
    * 获取根结点
-   *
-   * @type {(T | Nil)}
-   * @memberof BinarySearchTree
    */
-  get root(): T | Nil {
+  get root(): T {
     return this._root
   }
 
   /**
    * 结点数量
-   *
-   * @readonly
-   * @memberof BinarySearchTree
    */
-  get size() {
+  get size(): number {
     return this._size
   }
 
-  /// 设置左子结点，同时维护 parent 关系
-  setLeft(node: T, child: T) {
-    // 断开旧 left 结点
-    if (node.left !== null) {
-      node.left.parent = null;
-    }
-    // 连接新结点
-    if (child !== null) {
-      // 从旧 parent 中断开
-      if (child.parent !== null) {
-        child.parent.left === child 
-          ? (child.parent.left = null)
-          : (child.parent.right = null);
-      }
-      child.parent = node;
-    }
-    node.left = child;
-  }
+  /**
+   * 插入数据
+   *
+   * @param {K} key
+   * @param {V} [value]
+   * @memberof BinarySearchTree
+   */
+  abstract insert(key: K, value?: V): void
 
-  /// 设置右子结点，同时维护 parent 关系
-  setRight(node: T, child: T) {
-    // 断开旧 right 结点
-    if (node.right !== null) {
-      node.right.parent = null;
-    }
-    // 连接新结点
-    if (child !== null) {
-      // 从旧 parent 中断开
-      if (child.parent !== null) {
-        child.parent.left === child 
-          ? (child.parent.left = null)
-          : (child.parent.right = null);
-      }
-      child.parent = node;
-    }
-    node.right = child;
-  }
+  /**
+   * 移除数据
+   *
+   * @param {K} key
+   * @returns {boolean}
+   * @memberof BinarySearchTree
+   */
+  abstract delete(key: K): boolean  
+
+  /**
+   * 清空数据
+   */
+  clear(): void {
+    this._size = 0
+    this._setRoot(null)
+  }  
 
   /**
    * 获取中序遍历顺序时，node 的后继结点
@@ -77,7 +64,6 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    *
    * @param {T} node
    * @returns {(T | Nil)}
-   * @memberof BinarySearchTree
    */
   inorderSuccessor(node: T): T | Nil {
     if (node === null) return null;
@@ -110,7 +96,6 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    *
    * @param {T} node
    * @returns {(T | Nil)}
-   * @memberof BinarySearchTree
    */
   inorderPredecessor(node: T): T | Nil {
     if (node == null) return null;
@@ -135,74 +120,35 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
-   * 清空树
-   *
-   * @memberof BinarySearchTree
-   */
-  clear(): void {
-    this._size = 0
-    this._setRoot(null)
-  }
-
-  /**
-   * 迭代器执行器
-   *
-   * @param {IterableIterator<RbNode<K, V>>} iterator
-   * @param {((value: V, key: K, tree: this) => false | void)} iteratee
-   * @param {*} [thisArg]
-   * @returns
-   * @memberof BinarySearchTree
-   */
-  _for(iterator: IterableIterator<T>, iteratee: (key: K, value: V) => false | void) {
-    const tree = this
-    if (typeof iteratee !== 'function') return
-    if (tree.root === null) return
-    for (let node of iterator) {
-      if (iteratee(node.key, node.value) === false) {
-        break
-      }
-    }
-    return tree
-  }
-
-  /**
    * 中序迭代树结点
    *
-   * @param {((key: K, value: V) => false | void)} iteratee
+   * @param {(key: K, value: V) => any} iteratee
    * @returns {void}
    */
-  inorder(iteratee: (key: K, value: V) => false | void) {
+  inorder(iteratee: (key: K, value: V) => any) {
     return this._for(inorder(this._root), iteratee)
   }
 
   /**
    * 前序迭代树结点
    *
-   * @param {((key: K, value: V) => false | void)} iteratee
+   * @param {(key: K, value: V) => any} iteratee
    * @returns {void}
    */
-  preorder(iteratee: (key: K, value: V) => false | void) {
+  preorder(iteratee: (key: K, value: V) => any) {
     return this._for(preorder(this._root), iteratee)
   }
 
   /**
    * 后序迭代树结点
    *
-   * @param {((key: K, value: V) => false | void)} iteratee
+   * @param {(key: K, value: V) => any} iteratee
    * @returns {void}
    */
-  postorder(iteratee: (key: K, value: V) => false | void) {
+  postorder(iteratee: (key: K, value: V) => any) {
     return this._for(postorder(this._root), iteratee)
   }
   
-  /**
-   * Implement "iterable protocol"
-   */
-  *[Symbol.iterator]() {
-    const iterator = inorder(this._root)
-    for (let node of iterator) yield [ node.key, node.value ]
-  }
-
   /**
    * Implement "iterator protocol"
    */
@@ -220,6 +166,14 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
+   * Implement "iterable protocol"
+   */
+  *[Symbol.iterator]() {
+    const iterator = inorder(this._root)
+    for (let node of iterator) yield [node.key, node.value]
+  }  
+
+  /**
    * 获取迭代器
    *
    * @returns
@@ -229,25 +183,63 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
-   * 返回最小 key 对应的结点值
+   * Gets whether a node with a specific value is within the tree.
    *
-   * @returns {V}
+   * @param {K} key The value being searched for.
+   * @returns {boolean} Whether a node with the value exists.
    */
-  minimum(callback: (key: K, value: V) => any): void {
-    if (this._root === null) return;
-    const node = this._minimumNode(this._root)
+  has(key: K): boolean {
+    if (this._root === null) return false
+    return !!this.nodeSearch(key)
+  }
+
+  /**
+   * Gets the value of a node within the tree with a specific value.
+   *
+   * @param {K} key The key being searched for.
+   * @returns The node value or undefined if it doesn't exist.
+   */
+  value(key: K) {
+    if (this._root === null) return
+    const node = this.nodeSearch(key)
+    return node && node.value
+  }
+
+  /**
+   * Gets the data of a node within the tree with a specific value.
+   *
+   * @param {K} [key]
+   * @param {(key: K, value: V) => any} callback
+   */
+  search(key: K, callback: (key: K, value: V) => any): void {
+    if (this._root === null) {
+      callback(null, null);
+      return
+    }
+    const node = this.nodeSearch(key)
     callback(node.key, node.value)
   }
 
   /**
-   * 返回最大 key 对应的结点值
+   * 获取最小节点的 K、V 值
    *
    * @returns {V}
    */
-  maximum(callback: (key: K, value: V) => any): void {
-    if (this._root === null) return
+  minimum(): { key: K, value: V } | null {
+    if (this._root === null) return null;
     const node = this._minimumNode(this._root)
-    callback(node.key, node.value)
+    return { key: node.key, value: node.value }
+  }
+
+  /**
+   * 获取最大点的 K、V 值
+   *
+   * @returns {V}
+   */
+  maximum(): { key: K, value: V } | null {
+    if (this._root === null) return null
+    const node = this._minimumNode(this._root)
+    return { key: node.key, value: node.value }
   }
 
   /**
@@ -291,60 +283,46 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
-   * Gets whether a node with a specific value is within the tree.
-   *
-   * @param {K} key The value being searched for.
-   * @returns {boolean} Whether a node with the value exists.
-   */
-  has(key: K): boolean {
-    if (this._root === null) return false
-    return !!this.nodeSearch(key)
-  }
-
-  /**
-   * Gets the value of a node within the tree with a specific value.
-   *
-   * @param {K} key The key being searched for.
-   * @returns The node value or undefined if it doesn't exist.
-   */
-  value(key: K) {
-    if (this._root === null) return
-    const node = this.nodeSearch(key)
-    return node && node.value
-  }
-
-  /**
-   * Gets the data of a node within the tree with a specific value.
-   *
-   * @param {K} [key]
-   * @param {(key: K, value: V) => any} callback
-   */
-  search(key: K, callback: (key: K, value: V) => any): void {
-    if (this._root === null) {
-      callback(null, null);
-      return
+   * 设置左子结点，同时维护 parent 关系
+   */ 
+  protected setLeft(node: T, child: T): void {
+    // 断开旧 left 结点
+    if (node.left !== null) {
+      node.left.parent = null;
     }
-    const node = this.nodeSearch(key)
-    callback(node.key, node.value)
+    // 连接新结点
+    if (child !== null) {
+      // 从旧 parent 中断开
+      if (child.parent !== null) {
+        child.parent.left === child 
+          ? (child.parent.left = null)
+          : (child.parent.right = null);
+      }
+      child.parent = node;
+    }
+    node.left = child;
   }
 
   /**
-   * Inserts a new node with a specific key and value into the tree.
-   *
-   * @param {K} key
-   * @param {V} [value]
-   * @memberof BinarySearchTree
+   * 设置右子结点，同时维护 parent 关系
    */
-  abstract insert(key: K, value?: V): void
-
-  /**
-   * Deletes a node with a specific key from the tree.
-   *
-   * @param {K} key
-   * @returns {boolean}
-   * @memberof BinarySearchTree
-   */
-  abstract delete(key: K): boolean
+  protected setRight(node: T, child: T): void {
+    // 断开旧 right 结点
+    if (node.right !== null) {
+      node.right.parent = null;
+    }
+    // 连接新结点
+    if (child !== null) {
+      // 从旧 parent 中断开
+      if (child.parent !== null) {
+        child.parent.left === child 
+          ? (child.parent.left = null)
+          : (child.parent.right = null);
+      }
+      child.parent = node;
+    }
+    node.right = child;
+  }
 
   /**
    * 将树上某个结点替换成另一个结点
@@ -355,7 +333,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    * @returns {T} 返回被替换的结点
    * @memberof BinarySearchTree
    */
-  replaceNode(node: T, replacer: T | Nil): T {
+  protected replaceNode(node: T, replacer: T | Nil): T {
     if (node === replacer) return node
 
     // node 为 root 的情况
@@ -382,7 +360,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   ///     s   u                      c   s
   ///
   /// @returns {this} The root of the sub-tree; the node where this node used to be.
-  rotateLeft(node: T): T {
+  protected rotateLeft(node: T): T {
     const parent = node.parent;
     // 记录原本在树上的位置
     const isLeft = parent !== null && parent.left == node;
@@ -417,7 +395,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   ///   c   s                           s   u
   ///
   /// @returns {this} The root of the sub-tree; the node where this node used to be.
-  rotateRight(node: T): T {
+  protected rotateRight(node: T): T {
     const parent = node.parent;
     // 记录原本在树上的位置
     const isLeft = parent !== null && parent.left === node;    
@@ -451,10 +429,11 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    * @returns {(T | Nil)} The node or null if it doesn't exist.
    * @memberof BinarySearchTree
    */
-  nodeSearch(key: K): T | Nil {
+  protected nodeSearch(key: K): T | Nil {
+    const compare = this.compare
     let current = this._root
     while (current !== null) {
-      let result = key.compareTo(current.key)
+      let result = compare(key, current.key)
       if (result === 0) return current
       if (result < 0) current = current.left
       else current = current.right
@@ -471,7 +450,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    * @returns {T} 返回新插入（或刷新）的结点
    * @memberof BinarySearchTree
    */
-  nodeInsert(node: T): T {
+  protected nodeInsert(node: T): T {
     // 空树
     if (this._root === null) {
       this._setRoot(node)
@@ -479,12 +458,13 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
       return null
     }
 
+    const compare = this.compare
     const key = node.key
     let current: T = this._root
 
     // 查找待插入的位置
     while (true) {
-      const result = key.compareTo(current.key)
+      const result = compare(key, current.key)
       if (result > 0) {
         if (current.right === null) {
           this.setRight(current, node)
@@ -533,7 +513,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    * @returns {([T | Nil, T | Nil, T])}
    * @memberof BinarySearchTree
    */
-  nodeErase(node: T): {
+  protected nodeErase(node: T): {
     parent: T | Nil,
     child: T | Nil,
     node: T
@@ -570,6 +550,24 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
   }
 
   /**
+   * 迭代
+   *
+   * @param {IterableIterator<T>} iterator
+   * @param {(key: K, value: V) => any} iteratee
+   * @returns {void}
+   */
+  private _for(iterator: IterableIterator<T>, iteratee: (key: K, value: V) => any): void {
+    const tree = this
+    if (typeof iteratee !== 'function') return
+    if (tree.root === null) return
+    for (let node of iterator) {
+      if (iteratee(node.key, node.value) === false) {
+        break
+      }
+    }
+  }  
+
+  /**
    * Gets the minimum value node, rooted in a particular node.
    *
    * @param {T} subRoot The node to search.
@@ -597,10 +595,10 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
       current = current.right
     }
     return current
-  }
+  }  
 
   /// 设置根结点
-  _setRoot(node: T): void {
+  private _setRoot(node: T): void {
     if (node === null) {
       this._root = null;
       return;
@@ -620,7 +618,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    *
    * @memberof BinarySearchTree
    */
-  _increaseSize(): void {
+  private _increaseSize(): void {
     this._size += 1
   }
   /**
@@ -628,7 +626,7 @@ export abstract class BinarySearchTree<K extends Comparable, V, T extends Node<K
    *
    * @memberof BinarySearchTree
    */
-  _decreaseSize(): void {
+  private _decreaseSize(): void {
     this._size -= 1
   }
 }

@@ -11,42 +11,34 @@
  * 如果在所有简单路径中黑色结点数量为 B（最短路径是全黑结点），那么最长的可能路径长度为 2B（红黑交替）。
  */
 
-import { Comparable } from './Comparable'
 import { BinarySearchTree } from './BinarySearchTree'
 import { Node, Nil } from './Node'
 
-const RED = 1
-const BLACK = 0
-export type Color = number
+const enum Color {
+  Red = 1,
+  Black = 0
+}
 
-export class RBNode<K extends Comparable, V> implements Node<K, V> {
+export class RedBlackNode<K, V> implements Node<K, V> {
   parent: this = null
   left: this = null
   right: this = null
+
   constructor(public key: K, public value?: V) {}
 
-  /**
-   * 结点颜色，新插入结点默认红色
-   *
-   * @type {Color}
-   * @memberof RBNode
-   */
-  color: Color = RED
+  // 结点颜色，新插入结点默认红色
+  color: Color = Color.Red
 }
 
-export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> extends BinarySearchTree<K, V, T> {
-  /**
-   * Inserts a new node with a specific key and value into the tree.
-   *
-   * @param {K} key
-   * @param {V} [value]
-   * @memberof RedBlackTree
-   */
+export class RedBlackTree<K, V, T extends RedBlackNode<K, V>> extends BinarySearchTree<K, V, T> {
+  constructor(compare?: (a: K, b: K) => number) {
+    super(compare)
+  }
 
   // @override
   insert(key: K, value?: V): void {
     // 插入的结点为红色，因为插入红色结点不会破坏性质 5)，需要修复的情况只有 4)。
-    const insert = new RBNode<K, V>(key, value) as T;
+    const insert = new RedBlackNode<K, V>(key, value) as T;
     // 返回插入点
     const insertPoint = this.nodeInsert(insert);
 
@@ -55,7 +47,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // 2. 插入的是 root，直接调整颜色即可
     if (insertPoint === null) {
       if (this.size === 1) {
-        insert.color = BLACK;
+        insert.color = Color.Black;
       }
       return;
     } 
@@ -65,7 +57,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // B. 插入的是红色的，因此：
     // 结合 A，B，只有 parent 为红色，才可能破坏性质 4)
     // 2. parent 是黑色的，无需调整
-    if (insertPoint === null || insertPoint.color === BLACK) {
+    if (insertPoint === null || insertPoint.color === Color.Black) {
       return;
     }
 
@@ -74,13 +66,6 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     this._insertFixUp(insert, insertPoint);
   }
 
-  /**
-   * Deletes a node with a specific key from the tree.
-   *
-   * @param {K} key
-   * @returns {boolean} 是否成功删除结点
-   * @memberof RedBlackTree
-   */
   // @override
   delete(key: K): boolean {
     // 搜索待删除结点
@@ -100,7 +85,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // 删掉的结点为红色，无需调整
     // 注：被删结点为红色时，该红色结点的两个黑色孩子必定是 Nil 节点
     // 否则被删前不符合性质 5)
-    if (removed.color === RED) {
+    if (removed.color === Color.Red) {
       return true;
     }
 
@@ -110,8 +95,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // 删掉的为黑色结点，上顶补位的子结点为红色时，
     // 则直接将该子结点染成黑色即可恢复红黑树性质
     // 注：被删的黑色结点要么只有一个红色子结点，要么有两个 Nil 子结点
-    if (replacer !== null && replacer.color === RED) {
-      replacer.color = BLACK;
+    if (replacer !== null && replacer.color === Color.Red) {
+      replacer.color = Color.Black;
       return true;
     }
 
@@ -133,7 +118,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
   }
 
   /**
-   * 
+   * 插入后的调整
    *
    * @private
    * @param {(T | Nil)} current
@@ -145,7 +130,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
     // 1. 插入结点为红色
     // 2. 父节点为红色
     // 3. 祖父结点为黑色
-    while (parent !== null && parent.color === RED) {
+    while (parent !== null && parent.color === Color.Red) {
       // 祖父总是非空的（父节点为红，必定有黑色的祖父结点）
       let grandparent = parent.parent!
 
@@ -169,10 +154,10 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
        *
        * 但因为 g 的父结点也可能为红色，而规则 4) 不允许这种情况，所以需要回溯处理 g（此时的情况相当于插入了红色的 g）.
        */
-      if (uncle !== null && uncle.color === RED) {
-        parent.color = BLACK
-        uncle.color = BLACK
-        grandparent.color = RED
+      if (uncle !== null && uncle.color === Color.Red) {
+        parent.color = Color.Black
+        uncle.color = Color.Black
+        grandparent.color = Color.Red
 
         // 更新游标，如果 current 已经是 root，
         // 进阶着的循环条件判断会通不过，安全退出
@@ -221,8 +206,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           *   (c)                   U             U 
           */
         this.rotateRight(grandparent)
-        parent.color = BLACK
-        grandparent.color = RED
+        parent.color = Color.Black
+        grandparent.color = Color.Red
       }
       else {
         // 父节点在右侧的情况，镜像左侧情况的处理方式即可
@@ -234,19 +219,19 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
         }
         /* Case 3 - left rotate at gparent */
         this.rotateLeft(grandparent)
-        parent.color = BLACK
-        grandparent.color = RED
+        parent.color = Color.Black
+        grandparent.color = Color.Red
       }
 
       break
     }
 
     // 最后一步是染黑根结点进行兜底
-    (this.root as T).color = BLACK
+    this.root.color = Color.Black
   }
 
   /**
-   * 
+   * 删除后的调整操作
    *
    * @private
    * @param {T} nil
@@ -262,7 +247,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
       let sibling = (currentIsLeft ? parent.right : parent.left)
 
       // sibling 黑色
-      if (sibling === null || sibling.color === BLACK) {
+      if (sibling === null || sibling.color === Color.Black) {
         // Case 1: sibling 为黑色，且 sibling 有一个与其方向一致的红色子结点 sr OR sl
         //
         //       p?              s?
@@ -275,7 +260,7 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
         // 旋转和着色后完成删除
         let outwardSon = siblingIsLeft ? sibling.left : sibling.right
         let inwardSon = siblingIsLeft ? sibling.right : sibling.left
-        if (outwardSon !== null && outwardSon.color === RED) {
+        if (outwardSon !== null && outwardSon.color === Color.Red) {
           if (siblingIsLeft) {
             this.rotateRight(parent)
           }
@@ -284,20 +269,20 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           }
 
           // 将 parent 的颜色转移到 sibling
-          if (parent !== null && parent.color === RED) sibling.color = RED
-          else sibling.color = BLACK
+          if (parent !== null && parent.color === Color.Red) sibling.color = Color.Red
+          else sibling.color = Color.Black
 
-          parent.color = BLACK
-          outwardSon.color = BLACK
+          parent.color = Color.Black
+          outwardSon.color = Color.Black
           if (current === nil) {
             this.replaceNode(nil, null)
           }
           else {
-            current.color = BLACK
+            current.color = Color.Black
           }
           return
         }
-        else if (inwardSon !== null && inwardSon.color === RED) {
+        else if (inwardSon !== null && inwardSon.color === Color.Red) {
           // Case 2:
           // sibling 为黑色，且 sibling 有一个与其方向不一致的红色子结点 sr OR sl
           //
@@ -310,8 +295,8 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           // 或者对称方向
           // 旋转和重新着色后，变成 Case 1
           siblingIsLeft ? this.rotateLeft(sibling) : this.rotateRight(sibling)
-          inwardSon.color = BLACK
-          sibling.color = RED
+          inwardSon.color = Color.Black
+          sibling.color = Color.Red
           continue
         }
         else {
@@ -323,14 +308,14 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
           //     (p)           P
           //    /  \  --->    / \
           //  NIL  S        NIL (s)
-          if (parent !== null && parent.color === RED) {
-            parent.color = BLACK
-            sibling.color = RED
+          if (parent !== null && parent.color === Color.Red) {
+            parent.color = Color.Black
+            sibling.color = Color.Red
             if (current === nil) {
               this.replaceNode(nil, null)
             }
             else {
-              current.color = BLACK
+              current.color = Color.Black
             }
             return
           }
@@ -341,9 +326,9 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
               this.replaceNode(nil, null)
             }
             else {
-              current.color = BLACK
+              current.color = Color.Black
             }
-            sibling.color = RED
+            sibling.color = Color.Red
             current = parent
             continue
           }
@@ -359,18 +344,19 @@ export class RedBlackTree<K extends Comparable, V, T extends RBNode<K, V>> exten
         //                    / \
         // 或者对称
         siblingIsLeft ? this.rotateRight(parent) : this.rotateLeft(parent)
-        sibling.color = BLACK
-        parent.color = RED
+        sibling.color = Color.Black
+        parent.color = Color.Red
         continue
       }
     }
 
-    if (this.root !== null) (this.root as T).color = BLACK
+    if (this.root !== null) this.root.color = Color.Black
   }
 
+  // 空节点
   private _nil(): T {
-    const nil = new RBNode({ compareTo: (other: any) => 0 }, null)
-    nil.color = BLACK
+    const nil = new RedBlackNode(null, null)
+    nil.color = Color.Black
     return nil as T
   }
 }

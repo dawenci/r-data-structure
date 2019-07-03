@@ -1,5 +1,12 @@
-import Node from './Node';
-export default class AVLNode<K = any, V = any> extends Node<K, V> {
+import { BinarySearchTree } from './BinarySearchTree';
+import { Node } from './Node';
+export declare class AvlNode<K, V> implements Node<K, V> {
+    key: K;
+    value?: V;
+    parent: this;
+    left: this;
+    right: this;
+    constructor(key: K, value?: V);
     /**
      * 记录高度
      *
@@ -61,16 +68,19 @@ export default class AVLNode<K = any, V = any> extends Node<K, V> {
      * @memberof Node
      */
     updateHeight(): void;
-    /**
-     * 右旋，返回新顶点，注意旋转完毕会从原本的树上脱落
-     * @returns {AVLNode} The root of the sub-tree; the node where this node used to be.
-     * @memberof AVLNode
-     */
-    rotateRight(): this;
-    /**
-     * 左旋，返回新顶点，注意旋转完毕会从原本的树上脱落
-     * @returns {AVLNode} The root of the sub-tree; the node where this node used to be.
-     * @memberof AVLNode
-     */
-    rotateLeft(): this;
+}
+export declare class Avl<K, V, T extends AvlNode<K, V>> extends BinarySearchTree<K, V, T> {
+    constructor(compare?: (a: K, b: K) => number);
+    rotateRight(node: T): T;
+    rotateLeft(node: T): T;
+    insert(key: K, value?: V): void;
+    delete(key: K): boolean;
+    private _adjustAfterInsertion;
+    private _adjustAfterRemoval;
+    private _adjustLeftLeft;
+    private _adjustRightRight;
+    private _adjustLeftRight;
+    private _adjustRightLeft;
+    private _isUnbalanced;
+    private _rebalance;
 }

@@ -1,6 +1,5 @@
-import { Comparable } from './Comparable';
 export declare type Nil = null;
-export interface Node<K extends Comparable, V> {
+export interface Node<K, V> {
     parent: this | Nil;
     left: this | Nil;
     right: this | Nil;

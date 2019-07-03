@@ -13,13 +13,13 @@ export default {
     {
       file: pkg.browser,
       format: 'umd',
-      name: 'DTree',
+      name: 'R',
       sourcemap: false
     },
     {
       file: pkg.browser.replace('.js', '.min.js'),
       format: 'umd',
-      name: 'DTree',
+      name: 'R',
       sourcemap: false
     }
   ],
