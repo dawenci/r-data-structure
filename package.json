@@ -1,10 +1,10 @@
 {
-  "name": "r-data-structure",
+  "name": "data-structures",
   "version": "1.0.0",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "browser": "dist/r-data-structure.js",
+  "browser": "dist/data-structures.js",
   "types": "types/index.d.ts",
   "scripts": {
     "dev": "rollup -c rollup.config.js -w",
