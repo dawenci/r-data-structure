@@ -107,7 +107,7 @@ export class SkipList<K, V> {
   /**
    * 获取 key 对应的值
    */
-  value(key: K): V {
+  value(key: K): V | undefined {
     const compare = this.compare
     let currentLevel = this._maxLevel
     let pred = this._head
@@ -121,7 +121,10 @@ export class SkipList<K, V> {
       currentLevel -= 1
     }
     const node = pred[0]
-    return node && node.value
+    if (node && compare(node.key, key) === 0) {
+      return node.value
+    }
+    return undefined
   }
 
   /**
